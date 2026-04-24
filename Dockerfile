@@ -5,15 +5,21 @@ RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
+    libjpeg-dev \
+    libfreetype-dev \
+    libwebp-dev \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
     zip \
     unzip \
-    mysql-client
+    mysql-client \
+    pkg-config \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
+# Configure and install PHP extensions
+RUN docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
+ && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
