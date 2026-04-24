@@ -23,7 +23,10 @@ class ReportController extends Controller
         unset($data['street']);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('reports', 'public');
+            $uploaded = cloudinary()->upload($request->file('image')->getRealPath(), [
+                'folder' => 'reports',
+            ]);
+            $data['image'] = $uploaded->getSecurePath();
         }
 
         \App\Models\Report::create($data);
