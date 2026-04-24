@@ -1,0 +1,6 @@
+{
+  "options": {
+    "phpVersion": "8.4",
+    "extensions": ["pdo", "pdo_mysql", "mysqli"]
+  }
+}
