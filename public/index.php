@@ -6,6 +6,17 @@ use Illuminate\Http\Request;
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
+// Debug: check if key files exist
+if (!file_exists(__DIR__.'/../vendor/autoload.php')) {
+    die('vendor/autoload.php missing');
+}
+if (!file_exists(__DIR__.'/../bootstrap/app.php')) {
+    die('bootstrap/app.php missing');
+}
+if (!is_writable(__DIR__.'/../storage')) {
+    die('storage not writable');
+}
+
 define('LARAVEL_START', microtime(true));
 
 // Determine if the application is in maintenance mode...
