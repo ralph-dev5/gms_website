@@ -23,11 +23,13 @@ class ReportController extends Controller
         unset($data['street']);
 
         if ($request->hasFile('image')) {
+            $cloudinaryUrl = env('CLOUDINARY_URL');
+            $parsed = parse_url($cloudinaryUrl);
             $cloudinary = new \Cloudinary\Cloudinary([
                 'cloud' => [
-                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
-                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                    'cloud_name' => ltrim($parsed['host'], '/'),
+                    'api_key'    => $parsed['user'],
+                    'api_secret' => $parsed['pass'],
                 ],
             ]);
             $result = $cloudinary->uploadApi()->upload(
