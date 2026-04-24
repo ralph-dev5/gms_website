@@ -1,69 +1,105 @@
-<x-layout>
-    <div class="min-h-screen flex bg-gray-100">
+﻿<x-layout>
+<div class="min-h-screen flex bg-gray-100">
 
-        <!-- Sidebar -->
-        <aside class="w-64 bg-white shadow-md flex flex-col">
-            <div class="p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
-            </div>
+    @include('partials.user-sidebar')
 
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="{{ route('dashboard') }}" 
-                   class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-200 font-semibold">
-                   Home
-                </a>
-                <a href="{{ route('reports.index') }}" 
-                   class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-200 font-semibold">
-                   View Reports
-                </a>
-                <a href="{{ route('settings') }}" 
-                   class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-200 font-semibold">
-                   Settings
-                </a>
-            </nav>
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-10 min-w-0">
 
-            <div class="p-4 border-t">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit"
-                        class="text-red px-4 py-2 rounded hover:bg-red-600 transition font-semibold">
-                        Logout
-                    </button>
-                </form>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-10">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">
+        <div class="flex justify-between items-center mb-2">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
                 Welcome, <span class="text-green-500">{{ auth()->user()->name }}</span>!
             </h1>
+            @include('partials.profile-dropdown')
+        </div>
 
-            <p class="text-gray-600 mb-8">
-                You have successfully registered and are logged in.
-            </p>
+        <p class="text-gray-600 mb-6">You have successfully logged in. Use the sidebar to navigate your dashboard.</p>
 
-            <!-- Status Boxes -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-yellow-100 text-yellow-800 rounded-lg p-6 shadow flex flex-col items-center">
-                    <h2 class="text-xl font-bold mb-2">Pending</h2>
-                    <p class="text-2xl font-extrabold">5</p>
-                </div>
-                <div class="bg-blue-100 text-blue-800 rounded-lg p-6 shadow flex flex-col items-center">
-                    <h2 class="text-xl font-bold mb-2">In Progress</h2>
-                    <p class="text-2xl font-extrabold">3</p>
-                </div>
-                <div class="bg-green-100 text-green-800 rounded-lg p-6 shadow flex flex-col items-center">
-                    <h2 class="text-xl font-bold mb-2">Completed</h2>
-                    <p class="text-2xl font-extrabold">12</p>
-                </div>
+        <!-- Status Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-yellow-100 text-yellow-800 rounded-lg p-6 shadow flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-2">Pending</h2>
+                <p class="text-2xl font-extrabold">{{ $pendingCount }}</p>
             </div>
+            <div class="bg-blue-100 text-blue-800 rounded-lg p-6 shadow flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-2">In Progress</h2>
+                <p class="text-2xl font-extrabold">{{ $inProgressCount }}</p>
+            </div>
+            <div class="bg-green-100 text-green-800 rounded-lg p-6 shadow flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-2">Completed</h2>
+                <p class="text-2xl font-extrabold">{{ $completedCount }}</p>
+            </div>
+        </div>
 
-            <!-- Add Report Button -->
-            <a href="{{ route('reports.create') }}"
-               class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-semibold">
-               + Add Report
-            </a>
-        </main>
-    </div>
+        <a href="{{ route('reports.create') }}"
+            class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-semibold mb-6">
+            + Add Report
+        </a>
+
+        <!-- Reports Table -->
+        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+            <h2 class="text-2xl font-bold mb-4">My Reports</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full border rounded-lg min-w-[600px]">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="py-2 px-4 text-left">Image</th>
+                            <th class="py-2 px-4 text-left">Title</th>
+                            <th class="py-2 px-4 text-left">Location</th>
+                            <th class="py-2 px-4 text-left">Status</th>
+                            <th class="py-2 px-4 text-left">Date & Time</th>
+                            <th class="py-2 px-4 text-left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($reports as $report)
+                            <tr class="border-b">
+                                <td class="py-2 px-4">
+                                    @if($report->image)
+                                        <img src="{{ asset('storage/' . $report->image) }}" class="w-14 h-14 object-cover rounded">
+                                    @else
+                                        <span class="text-gray-400 text-sm">No Image</span>
+                                    @endif
+                                </td>
+                                <td class="py-2 px-4 text-sm">{{ $report->title }}</td>
+                                <td class="py-2 px-4 text-sm">
+                                    @if ($report->location)
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ $report->location }}"
+                                            target="_blank" class="text-blue-600 hover:underline">View Map</a>
+                                    @else
+                                        N/A
+                                    @endif
+                                </td>
+                                <td class="py-2 px-4">
+                                    <span class="px-2 py-1 text-xs rounded whitespace-nowrap
+                                        {{ ($report->status ?? 'pending') == 'pending' ? 'bg-yellow-100 text-yellow-800'
+                                            : (($report->status) == 'in_progress' ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-green-100 text-green-800') }}">
+                                        {{ ucfirst(str_replace('_', ' ', $report->status ?? 'pending')) }}
+                                    </span>
+                                </td>
+                                <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{{ $report->created_at->format('M d, Y h:i A') }}</td>
+                                <td class="py-2 px-4">
+                                    <form action="{{ route('reports.destroy', $report->id) }}" method="POST"
+                                          onsubmit="return confirm('Are you sure you want to delete this report?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-4 px-4 text-center text-gray-500">No reports found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
 </x-layout>

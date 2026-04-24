@@ -26,7 +26,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             // Redirect based on user role
-            if (auth()->user()->is_admin) {
+            if (auth()->user()->is_admin == 1) {
                 return redirect()->route('admin.dashboard'); // Admin dashboard
             }
 

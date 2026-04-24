@@ -7,7 +7,8 @@ use Illuminate\Foundation\Http\Kernel as HttpKernel;
 class Kernel extends HttpKernel
 {
     /**
-     * The application's global HTTP middleware stack.
+     * Global HTTP middleware stack.
+     * These middleware run during every request to the application.
      */
     protected $middleware = [
         // \App\Http\Middleware\TrustHosts::class,
@@ -20,7 +21,7 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * The application's route middleware groups.
+     * Middleware groups used by routes.
      */
     protected $middlewareGroups = [
         'web' => [
@@ -39,11 +40,12 @@ class Kernel extends HttpKernel
     ];
 
     /**
-     * The application's route middleware.
+     * Route middleware aliases.
+     * These middleware can be assigned to routes or groups.
      */
-    protected $routeMiddleware = [
-        'auth'  => \App\Http\Middleware\Authenticate::class,
+    protected $middlewareAliases = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
-        'admin' => \App\Http\Middleware\AdminMiddleware::class, // ← Admin middleware
+        'admin' => \App\Http\Middleware\AdminMiddleware::class,
     ];
 }
