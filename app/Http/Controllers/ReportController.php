@@ -23,10 +23,18 @@ class ReportController extends Controller
         unset($data['street']);
 
         if ($request->hasFile('image')) {
-            $uploaded = cloudinary()->upload($request->file('image')->getRealPath(), [
-                'folder' => 'reports',
+            $cloudinary = new \Cloudinary\Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
             ]);
-            $data['image'] = $uploaded->getSecurePath();
+            $result = $cloudinary->uploadApi()->upload(
+                $request->file('image')->getRealPath(),
+                ['folder' => 'reports']
+            );
+            $data['image'] = $result['secure_url'];
         }
 
         \App\Models\Report::create($data);
