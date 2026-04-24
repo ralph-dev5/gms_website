@@ -16,7 +16,20 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/test', function () {
-    return 'Laravel is working!';
+    try {
+        return response()->json([
+            'status' => 'ok',
+            'php' => PHP_VERSION,
+            'env' => app()->environment(),
+            'debug' => config('app.debug'),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ], 500);
+    }
 });
 
 /*
