@@ -34,6 +34,22 @@ Route::get('/test', function () {
 
 /*
 |--------------------------------------------------------------------------
+| Temp: Create Admin Account
+|--------------------------------------------------------------------------
+*/
+Route::get('/create-admin', function () {
+    $user = App\Models\User::create([
+        'name' => 'Admin',
+        'email' => 'admin@example.com',
+        'password' => bcrypt('password123'),
+        'is_admin' => true,
+        'email_verified_at' => now(),
+    ]);
+    return 'Admin account created!';
+});
+
+/*
+|--------------------------------------------------------------------------
 | Home Page
 |--------------------------------------------------------------------------
 */
@@ -181,13 +197,4 @@ Route::middleware('auth')->group(function () {
     Route::put('/settings/password', [\App\Http\Controllers\UserController::class, 'updatePassword'])
         ->name('settings.updatePassword');
 
-});
-
-Route::get('/make-admin', function () {
-    $user = App\Models\User::where('email', 'ralpadrianmarabillo05@gmail.com')->first();
-    if ($user) {
-        $user->update(['is_admin' => true]);
-        return 'Admin created successfully!';
-    }
-    return 'User not found!';
 });
