@@ -1,15 +1,7 @@
-# Create railpack.json
 @'
 {
-  "providers": {
-    "php": {
-      "version": "8.4"
-    }
+  "options": {
+    "phpVersion": "8.4"
   }
 }
 '@ | Out-File -FilePath railpack.json -Encoding utf8
-
-# Create .php-version
-@'
-8.4
-'@ | Out-File -FilePath .php-version -Encoding utf8
