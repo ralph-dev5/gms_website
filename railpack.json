@@ -1,7 +1,0 @@
-@'
-{
-  "options": {
-    "phpVersion": "8.4"
-  }
-}
-'@ | Out-File -FilePath railpack.json -Encoding utf8
