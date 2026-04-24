@@ -38,12 +38,9 @@ Route::get('/test', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/create-admin', function () {
-    $user = App\Models\User::where('email', 'admin@example.com')->first();
-    if ($user) {
-        $user->update(['is_admin' => 1]);
-        return 'Admin updated! is_admin = ' . $user->fresh()->is_admin;
-    }
-    return 'User not found';
+    \DB::table('users')->where('email', 'admin@example.com')->update(['is_admin' => 1]);
+    $user = \DB::table('users')->where('email', 'admin@example.com')->first();
+    return 'is_admin = ' . $user->is_admin;
 });
 
 /*
