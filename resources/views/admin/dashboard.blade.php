@@ -92,7 +92,7 @@
                                             </button>
                                         </form>
                                     </td>
-                                    <td class="p-4 text-gray-400 text-[11px] font-bold uppercase">{{ $report->created_at->format('M d, Y') }}</td>
+                                    <td class="p-4 text-gray-400 text-[11px] font-bold uppercase">{{ $report->created_at->format('M d, Y h:i A') }}</td>
                                     <td class="p-4 text-center">
                                         @if($report->status === 'completed')
                                             <form action="{{ route('admin.reports.destroy', $report->id) }}" method="POST"
