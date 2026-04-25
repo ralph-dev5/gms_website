@@ -50,7 +50,7 @@
                         <div class="flex justify-between items-center">
                             <label class="text-sm font-black text-gray-700 uppercase tracking-wider">Pin Location</label>
                             <button type="button" id="detect-location"
-                                class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                                class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 p-1 rounded hover:bg-blue-50 transition">
                                 <span id="detect-text">📍 Refresh Location</span>
                             </button>
                         </div>
@@ -60,7 +60,7 @@
                         <input type="hidden" name="location" id="location-input" required>
 
                         <div class="p-3 bg-gray-50 rounded-lg border border-gray-100" id="location-display">
-                            <p class="text-xs text-gray-500 italic text-center">Finding your coordinates...</p>
+                            <p class="text-xs text-gray-500 italic text-center">Tap "Refresh Location" or the map to pin.</p>
                         </div>
                     </div>
                 </div>
@@ -77,6 +77,7 @@
         let map, marker, selectedLocation = null;
 
         function initMap() {
+            // Default to Magallanes area
             const defaultLocation = { lat: 12.6685, lng: 123.8812 };
 
             map = new google.maps.Map(document.getElementById('map'), {
@@ -87,15 +88,14 @@
                 styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
             });
 
-            // Map click listener
             map.addListener('click', (event) => {
                 updatePosition(event.latLng);
             });
 
+            // Attempt to auto-detect on initial load
             autoDetect();
         }
 
-        // Shared function to update marker and internal state
         function updatePosition(latLng) {
             if (marker) { marker.setMap(null); }
             
@@ -106,7 +106,6 @@
                 animation: google.maps.Animation.DROP,
             });
 
-            // Handle manual drag of the marker
             marker.addListener('dragend', (event) => {
                 saveToInput(event.latLng);
             });
@@ -118,7 +117,6 @@
             const lat = latLng.lat();
             const lng = latLng.lng();
             
-            // CRITICAL: Update both the global variable AND the hidden input field
             selectedLocation = { lat, lng };
             document.getElementById('location-input').value = `${lat},${lng}`;
             
@@ -130,9 +128,19 @@
         }
 
         function autoDetect() {
-            if (!navigator.geolocation) return;
+            if (!navigator.geolocation) {
+                alert("Your browser does not support location services.");
+                return;
+            }
 
-            document.getElementById('detect-text').innerText = '⏳ Locating...';
+            const detectText = document.getElementById('detect-text');
+            detectText.innerText = '⏳ Locating...';
+
+            const geoOptions = {
+                enableHighAccuracy: true,
+                timeout: 8000,
+                maximumAge: 0
+            };
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -140,24 +148,29 @@
                     map.setCenter(loc);
                     map.setZoom(17);
                     updatePosition(loc);
-                    document.getElementById('detect-text').innerText = '📍 Refresh Location';
+                    detectText.innerText = '📍 Refresh Location';
                 },
                 (err) => {
-                    document.getElementById('detect-text').innerText = '📍 Pin Manually';
-                    document.getElementById('location-display').innerHTML = '<p class="text-xs text-red-500 text-center">Auto-location failed. Please tap the map to pin.</p>';
+                    detectText.innerText = '📍 Refresh Location';
+                    let errorMsg = "Unable to detect location.";
+                    
+                    if (err.code === 1) errorMsg = "Location denied. Check browser permissions.";
+                    if (err.code === 3) errorMsg = "GPS timeout. Try again or tap the map.";
+                    
+                    document.getElementById('location-display').innerHTML = 
+                        `<p class="text-xs text-red-500 text-center font-semibold">${errorMsg}</p>`;
                 }, 
-                { enableHighAccuracy: true, timeout: 5000 }
+                geoOptions
             );
         }
 
         document.getElementById('detect-location').addEventListener('click', autoDetect);
 
-        // Validation before submission
         document.getElementById('reportForm').addEventListener('submit', (e) => {
             const locationValue = document.getElementById('location-input').value;
             if (!selectedLocation || !locationValue) {
                 e.preventDefault();
-                alert('Please pin the garbage location on the map before submitting.');
+                alert('Please pin the location on the map before submitting.');
             }
         });
     </script>
