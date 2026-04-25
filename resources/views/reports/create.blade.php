@@ -1,71 +1,74 @@
 <x-layout>
-    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
-        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-xl p-8">
-            <h1 class="text-3xl font-bold text-gray-800 mb-6">Add Report</h1>
+    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4 md:p-10">
+        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+            <div class="bg-green-600 p-6">
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 15.667c-.77 1.333.192 3 1.732 3z"/></svg>
+                    Report Garbage Issue
+                </h1>
+            </div>
 
-            <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="p-8 space-y-8">
                 @csrf
 
-                <!-- Street Dropdown -->
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Street</label>
-                    <div class="relative">
-                        <select name="street" id="street-select" required
-                            class="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white cursor-pointer">
-                            <option value="" disabled selected>-- Select a street --</option>
-                            <option value="Hernandez St">Hernandez St</option>
-                            <option value="Monreal St">Monreal St</option>
-                            <option value="Escurel St">Escurel St</option>
-                            <option value="Zamora St">Zamora St</option>
-                            <option value="Osmeña St">Osmeña St</option>
-                            <option value="Del Pilar St">Del Pilar St</option>
-                            <option value="Burgos St">Burgos St</option>
-                            <option value="Rizal St">Rizal St</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7" />
-                            </svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-black text-gray-700 uppercase tracking-wider mb-2">Target Street</label>
+                            <div class="relative">
+                                <select name="street" id="street-select" required
+                                    class="w-full border-2 border-gray-100 px-4 py-3 rounded-xl focus:border-green-500 focus:ring-0 transition appearance-none bg-gray-50 cursor-pointer text-gray-700 font-medium">
+                                    <option value="" disabled selected>Select location...</option>
+                                    <option value="Hernandez St">Hernandez St</option>
+                                    <option value="Monreal St">Monreal St</option>
+                                    <option value="Escurel St">Escurel St</option>
+                                    <option value="Zamora St">Zamora St</option>
+                                    <option value="Osmeña St">Osmeña St</option>
+                                    <option value="Del Pilar St">Del Pilar St</option>
+                                    <option value="Burgos St">Burgos St</option>
+                                    <option value="Rizal St">Rizal St</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-4 flex items-center text-gray-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-black text-gray-700 uppercase tracking-wider mb-2">Evidence Photo</label>
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <svg class="w-8 h-8 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    <p class="text-xs text-gray-500">Tap to upload photo</p>
+                                </div>
+                                <input type="file" name="image" accept="image/*" required class="hidden">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <label class="text-sm font-black text-gray-700 uppercase tracking-wider">Pin Location</label>
+                            <button type="button" id="detect-location"
+                                class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                                <span id="detect-text">📍 Refresh Location</span>
+                            </button>
+                        </div>
+
+                        <div id="map" class="w-full h-64 md:h-80 rounded-2xl border-2 border-gray-100 shadow-inner"></div>
+
+                        <input type="hidden" name="location" id="location-input" required>
+
+                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-100" id="location-display">
+                            <p class="text-xs text-gray-500 italic text-center">Finding your coordinates...</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Upload Image -->
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">
-                        Upload Image <span class="text-red-500">*</span>
-                    </label>
-                    <input type="file" name="image" accept="image/*" required
-                        class="w-full border px-4 py-2 rounded-lg">
-                </div>
-
-                <!-- Location with Map -->
-                <div>
-                    <label class="block text-gray-700 font-semibold mb-2">Location</label>
-
-                    <button type="button" id="detect-location"
-                        class="mb-3 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
-                        📍 Pin My Location
-                    </button>
-
-                    <!-- Google Map -->
-                    <div id="map" class="w-full h-96 rounded-lg border-2 border-gray-300 mb-3"></div>
-
-                    <input type="hidden" name="location" id="location-input" required>
-
-                    <p class="text-sm text-gray-600" id="location-display">
-                        Click on the map to pin your location
-                    </p>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="pt-4">
-                    <button type="submit"
-                        class="w-full bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-semibold">
-                        Submit Report
-                    </button>
-                </div>
+                <button type="submit"
+                    class="w-full bg-green-600 text-white px-6 py-4 rounded-2xl hover:bg-green-700 transition-all font-black text-lg shadow-xl shadow-green-100 active:scale-95">
+                    SUBMIT REPORT
+                </button>
             </form>
         </div>
     </div>
@@ -74,30 +77,33 @@
         let map, marker, selectedLocation = null;
 
         function initMap() {
-            const defaultLocation = { lat: 14.5995, lng: 120.9842 };
+            // Default center (Magallanes area)
+            const defaultLocation = { lat: 12.6685, lng: 123.8812 };
 
             map = new google.maps.Map(document.getElementById('map'), {
                 center: defaultLocation,
-                zoom: 13,
-                mapTypeControl: true,
-                streetViewControl: false,
+                zoom: 15,
+                disableDefaultUI: true,
+                zoomControl: true,
+                styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
             });
 
             map.addListener('click', (event) => {
                 placeMarker(event.latLng);
             });
+
+            // TRIGGER AUTO-LOCATION ON LOAD
+            autoDetect();
         }
 
         function placeMarker(location) {
             if (marker) { marker.setMap(null); }
-
             marker = new google.maps.Marker({
                 position: location,
                 map: map,
                 draggable: true,
                 animation: google.maps.Animation.DROP,
             });
-
             marker.addListener('dragend', (event) => updateLocation(event.latLng));
             updateLocation(location);
         }
@@ -108,43 +114,51 @@
             selectedLocation = { lat, lng };
             document.getElementById('location-input').value = `${lat},${lng}`;
             document.getElementById('location-display').innerHTML = `
-                <span class="text-green-600 font-semibold">✓ Location selected:</span>
-                <a href="https://www.google.com/maps/search/?api=1&query=${lat},${lng}"
-                   target="_blank" class="text-blue-600 hover:underline">
-                   ${lat.toFixed(6)}, ${lng.toFixed(6)}
-                </a>`;
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-green-600 font-bold uppercase tracking-tighter">✓ Position Locked</span>
+                    <span class="text-gray-400 font-mono">${lat.toFixed(5)}, ${lng.toFixed(5)}</span>
+                </div>`;
         }
 
-        document.getElementById('detect-location').addEventListener('click', () => {
-            if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser.');
-                return;
-            }
-            document.getElementById('detect-location').innerHTML = '⏳ Detecting...';
+        function autoDetect() {
+            if (!navigator.geolocation) return;
+
+            const options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            document.getElementById('detect-text').innerText = '⏳ Locating...';
+
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
                     map.setCenter(loc);
-                    map.setZoom(15);
+                    map.setZoom(17);
                     placeMarker(loc);
-                    document.getElementById('detect-location').innerHTML = '📍 Detect My Location';
+                    document.getElementById('detect-text').innerText = '📍 Refresh Location';
                 },
-                () => {
-                    alert('Unable to detect your location. Please click on the map manually.');
-                    document.getElementById('detect-location').innerHTML = '📍 Detect My Location';
-                }
+                (err) => {
+                    console.warn(`ERROR(${err.code}): ${err.message}`);
+                    document.getElementById('detect-text').innerText = '📍 Pin Manually';
+                    document.getElementById('location-display').innerHTML = '<p class="text-xs text-red-500 text-center">Cannot detect location. Please tap the map.</p>';
+                }, 
+                options
             );
-        });
+        }
+
+        document.getElementById('detect-location').addEventListener('click', autoDetect);
 
         document.querySelector('form').addEventListener('submit', (e) => {
             if (!selectedLocation) {
                 e.preventDefault();
-                alert('Please select a location on the map before submitting.');
+                alert('Please pin the garbage location on the map first.');
             }
         });
     </script>
 
     <script async defer
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&callback=initMap">
-        </script>
+    </script>
 </x-layout>
