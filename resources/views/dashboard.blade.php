@@ -1,100 +1,90 @@
 ﻿<x-layout>
-<div class="min-h-screen flex flex-col md:flex-row bg-gray-100">
+<div class="min-h-screen flex bg-gray-100">
 
     @include('partials.user-sidebar')
 
-    <main class="flex-1 p-4 md:p-10 min-w-0 w-full">
+    <!-- Main Content -->
+    <main class="flex-1 p-4 md:p-10 min-w-0">
 
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
-                    Welcome, <span class="text-green-500">{{ auth()->user()->name }}</span>!
-                </h1>
-                <p class="text-gray-600 text-sm mt-1">You have successfully logged in.</p>
-            </div>
-            <div class="self-end md:self-auto">
-                @include('partials.profile-dropdown')
-            </div>
+        <div class="flex justify-between items-center mb-2">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+                Welcome, <span class="text-green-500">{{ auth()->user()->name }}</span>!
+            </h1>
+            @include('partials.profile-dropdown')
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div class="bg-yellow-100 text-yellow-800 rounded-2xl p-6 shadow-sm border border-yellow-200 flex flex-col items-center justify-center">
-                <h2 class="text-sm font-bold uppercase tracking-wider mb-1">Pending</h2>
-                <p class="text-3xl font-black">{{ $pendingCount }}</p>
+        <p class="text-gray-600 mb-6">You have successfully logged in. Use the sidebar to navigate your dashboard.</p>
+
+        <!-- Status Boxes -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-yellow-100 text-yellow-800 rounded-lg p-6 shadow flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-2">Pending</h2>
+                <p class="text-2xl font-extrabold">{{ $pendingCount }}</p>
             </div>
-            <div class="bg-blue-100 text-blue-800 rounded-2xl p-6 shadow-sm border border-blue-200 flex flex-col items-center justify-center">
-                <h2 class="text-sm font-bold uppercase tracking-wider mb-1">In Progress</h2>
-                <p class="text-3xl font-black">{{ $inProgressCount }}</p>
+            <div class="bg-blue-100 text-blue-800 rounded-lg p-6 shadow flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-2">In Progress</h2>
+                <p class="text-2xl font-extrabold">{{ $inProgressCount }}</p>
             </div>
-            <div class="bg-green-100 text-green-800 rounded-2xl p-6 shadow-sm border border-green-200 flex flex-col items-center justify-center">
-                <h2 class="text-sm font-bold uppercase tracking-wider mb-1">Completed</h2>
-                <p class="text-3xl font-black">{{ $completedCount }}</p>
+            <div class="bg-green-100 text-green-800 rounded-lg p-6 shadow flex flex-col items-center">
+                <h2 class="text-xl font-bold mb-2">Completed</h2>
+                <p class="text-2xl font-extrabold">{{ $completedCount }}</p>
             </div>
         </div>
 
         <a href="{{ route('reports.create') }}"
-            class="block md:inline-block text-center bg-green-500 text-white px-8 py-4 rounded-xl hover:bg-green-600 transition font-bold mb-8 shadow-lg shadow-green-200">
-            + Add New Report
+            class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition font-semibold mb-6">
+            + Add Report
         </a>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-5 border-b border-gray-50">
-                <h2 class="text-xl font-bold text-gray-800">My Reports History</h2>
-            </div>
-            
+        <!-- Reports Table -->
+        <div class="bg-white rounded-lg shadow p-4 md:p-6">
+            <h2 class="text-2xl font-bold mb-4">My Reports</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[700px]">
-                    <thead class="bg-gray-50">
+                <table class="min-w-full border rounded-lg min-w-[600px]">
+                    <thead class="bg-gray-200">
                         <tr>
-                            <th class="py-4 px-6 text-xs font-bold text-gray-400 uppercase">Image</th>
-                            <th class="py-4 px-6 text-xs font-bold text-gray-400 uppercase">Title</th>
-                            <th class="py-4 px-6 text-xs font-bold text-gray-400 uppercase">Location</th>
-                            <th class="py-4 px-6 text-xs font-bold text-gray-400 uppercase">Status</th>
-                            <th class="py-4 px-6 text-xs font-bold text-gray-400 uppercase">Date</th>
-                            <th class="py-4 px-6 text-xs font-bold text-gray-400 uppercase">Action</th>
+                            <th class="py-2 px-4 text-left">Image</th>
+                            <th class="py-2 px-4 text-left">Title</th>
+                            <th class="py-2 px-4 text-left">Location</th>
+                            <th class="py-2 px-4 text-left">Status</th>
+                            <th class="py-2 px-4 text-left">Date & Time</th>
+                            <th class="py-2 px-4 text-left">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody>
                         @forelse ($reports as $report)
-                            <tr class="hover:bg-gray-50/50 transition">
-                                <td class="py-4 px-6">
+                            <tr class="border-b">
+                                <td class="py-2 px-4">
                                     @if($report->image)
-                                        <img src="{{ $report->image }}" class="w-12 h-12 object-cover rounded-lg shadow-sm">
+                                        <img src="{{ $report->image }}" class="w-14 h-14 object-cover rounded">
                                     @else
-                                        <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                                            <span class="text-[10px] text-gray-400 font-bold uppercase">No Pic</span>
-                                        </div>
+                                        <span class="text-gray-400 text-sm">No Image</span>
                                     @endif
                                 </td>
-                                <td class="py-4 px-6 font-semibold text-gray-700 text-sm">{{ $report->title }}</td>
-                                <td class="py-4 px-6">
+                                <td class="py-2 px-4 text-sm">{{ $report->title }}</td>
+                                <td class="py-2 px-4 text-sm">
                                     @if ($report->location)
-                                        <a href="https://www.google.com/maps?q={{ $report->location }}"
-                                            target="_blank" class="text-blue-600 text-xs font-bold hover:underline inline-flex items-center gap-1">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                            View Map
-                                        </a>
+                                        <a href="https://www.google.com/maps/search/?api=1&query={{ $report->location }}"
+                                            target="_blank" class="text-blue-600 hover:underline">View Map</a>
                                     @else
-                                        <span class="text-gray-300 text-xs italic">No Data</span>
+                                        N/A
                                     @endif
                                 </td>
-                                <td class="py-4 px-6">
-                                    <span class="px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-tighter
-                                        {{ ($report->status ?? 'pending') == 'pending' ? 'bg-yellow-100 text-yellow-700'
-                                            : (($report->status) == 'in_progress' ? 'bg-blue-100 text-blue-700'
-                                            : 'bg-green-100 text-green-700') }}">
-                                        {{ str_replace('_', ' ', $report->status ?? 'pending') }}
+                                <td class="py-2 px-4">
+                                    <span class="px-2 py-1 text-xs rounded whitespace-nowrap
+                                        {{ ($report->status ?? 'pending') == 'pending' ? 'bg-yellow-100 text-yellow-800'
+                                            : (($report->status) == 'in_progress' ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-green-100 text-green-800') }}">
+                                        {{ ucfirst(str_replace('_', ' ', $report->status ?? 'pending')) }}
                                     </span>
                                 </td>
-                                <td class="py-4 px-6 text-[11px] text-gray-400 font-medium">
-                                    {{ $report->created_at->format('M d, Y') }}<br>
-                                    {{ $report->created_at->format('h:i A') }}
-                                </td>
-                                <td class="py-4 px-6">
+                                <td class="py-2 px-4 text-xs text-gray-500 whitespace-nowrap">{{ $report->created_at->format('M d, Y h:i A') }}</td>
+                                <td class="py-2 px-4">
                                     <form action="{{ route('reports.destroy', $report->id) }}" method="POST"
-                                          onsubmit="return confirm('Delete this report?');">
-                                        @csrf @method('DELETE')
-                                        <button class="text-red-500 hover:text-red-700 text-xs font-bold p-2 hover:bg-red-50 rounded-lg transition">
+                                          onsubmit="return confirm('Are you sure you want to delete this report?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-xs">
                                             Delete
                                         </button>
                                     </form>
@@ -102,7 +92,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center text-gray-400 italic">No reports found.</td>
+                                <td colspan="6" class="py-4 px-4 text-center text-gray-500">No reports found.</td>
                             </tr>
                         @endforelse
                     </tbody>
