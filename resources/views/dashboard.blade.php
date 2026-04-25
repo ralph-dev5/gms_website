@@ -7,7 +7,7 @@
     <main class="flex-1 p-4 md:p-10 min-w-0">
 
         <div class="flex justify-between items-center mb-2">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 pl-2">
                 Welcome, <span class="text-green-500">{{ auth()->user()->name }}</span>!
             </h1>
             @include('partials.profile-dropdown')
