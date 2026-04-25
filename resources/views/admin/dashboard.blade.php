@@ -43,7 +43,8 @@
                                 @if($report->image)
                                     <div class="relative group">
                                         <img src="{{ asset('storage/' . $report->image) }}" 
-                                             class="w-14 h-14 object-cover rounded-xl shadow-sm border border-gray-200 group-hover:scale-105 transition-transform">
+                                             class="w-14 h-14 object-cover rounded-xl shadow-sm border border-gray-200 group-hover:scale-105 transition-transform"
+                                             onerror="this.onerror=null;this.src='https://placehold.co/100?text=No+File';">
                                     </div>
                                 @else
                                     <div class="w-14 h-14 bg-gray-100 rounded-xl flex items-center justify-center border border-dashed border-gray-300">
