@@ -19,6 +19,7 @@
                 <table class="w-full text-left">
                     <thead class="bg-gray-100">
                         <tr>
+                            <th class="p-3">Image</th>
                             <th class="p-3">Title</th>
                             <th class="p-3">Location</th>
                             <th class="p-3">Status</th>
@@ -28,6 +29,20 @@
                     <tbody>
                         @forelse($reports as $report)
                         <tr class="border-b hover:bg-gray-50">
+                            {{-- Image Column --}}
+                            <td class="p-3">
+                                @if($report->image)
+                                    <img src="{{ $report->image }}" 
+                                         alt="Report Image" 
+                                         class="w-16 h-16 object-cover rounded-lg border border-gray-200">
+                                @else
+                                    <div class="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-lg text-gray-400 text-xs">
+                                        No Image
+                                    </div>
+                                @endif
+                            </td>
+
+                            {{-- Existing Logic Columns --}}
                             <td class="p-3 font-semibold">{{ $report->title }}</td>
                             <td class="p-3">{{ $report->location }}</td>
                             <td class="p-3">
@@ -40,7 +55,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="p-6 text-center text-gray-500">
+                            <td colspan="5" class="p-6 text-center text-gray-500">
                                 No reports submitted yet.
                             </td>
                         </tr>
