@@ -21,7 +21,7 @@ class ReportController extends Controller
     public function store(StoreReportRequest $request)
     {
         $data = $request->validated();
-        
+
         // Preserve existing logic: Set user, status, and move street to title
         $data['user_id'] = auth()->id();
         $data['status'] = 'pending';
@@ -35,7 +35,7 @@ class ReportController extends Controller
             $cloudinary = new Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
             ]);
@@ -62,7 +62,10 @@ class ReportController extends Controller
 
         $report->delete();
 
-        return redirect()->route('reports.deleted')->with('success', 'Report deleted successfully.');
+        // CHANGE THIS LINE:
+        // From: return redirect()->route('reports.deleted')->with('success', ...);
+        // To:
+        return redirect()->route('dashboard')->with('success', 'Report deleted successfully.');
     }
 
     public function deleted()
