@@ -24,7 +24,7 @@ class StoreReportRequest extends FormRequest
         return [
             'street' => ['required', 'string', 'max:255'],
             'location' => ['required', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'max:2048'],
+            'image' => ['nullable', 'image', 'max:20480'],
         ];
     }
 }
