@@ -36,12 +36,13 @@
 
                         <div>
                             <label class="block text-sm font-black text-gray-700 uppercase tracking-wider mb-2">Evidence Photo</label>
-                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
-                                <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition" id="photo-label">
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6" id="photo-placeholder">
                                     <svg class="w-8 h-8 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     <p class="text-xs text-gray-500">Tap to upload photo</p>
                                 </div>
-                                <input type="file" name="image" accept="image/*" required class="hidden">
+                                <img id="photo-preview" class="hidden w-full h-full object-cover rounded-xl" />
+                                <input type="file" name="image" id="photo-input" accept="image/*" required class="hidden">
                             </label>
                         </div>
                     </div>
@@ -50,8 +51,8 @@
                         <div class="flex justify-between items-center">
                             <label class="text-sm font-black text-gray-700 uppercase tracking-wider">Pin Location</label>
                             <button type="button" id="detect-location"
-                                class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 p-1 rounded hover:bg-blue-50 transition">
-                                <span id="detect-text">📍 Refresh Location</span>
+                                class="text-xs font-bold text-white bg-green-600 hover:bg-green-700 flex items-center gap-1 px-3 py-1.5 rounded-lg transition">
+                                <span id="detect-text">📍 Use My Location</span>
                             </button>
                         </div>
 
@@ -60,7 +61,7 @@
                         <input type="hidden" name="location" id="location-input" required>
 
                         <div class="p-3 bg-gray-50 rounded-lg border border-gray-100" id="location-display">
-                            <p class="text-xs text-gray-500 italic text-center">Tap "Refresh Location" or the map to pin.</p>
+                            <p class="text-xs text-gray-500 italic text-center">Click <strong>"Use My Location"</strong> or tap the map to pin your location.</p>
                         </div>
                     </div>
                 </div>
@@ -77,7 +78,6 @@
         let map, marker, selectedLocation = null;
 
         function initMap() {
-            // Default to Magallanes area
             const defaultLocation = { lat: 12.6685, lng: 123.8812 };
 
             map = new google.maps.Map(document.getElementById('map'), {
@@ -92,13 +92,12 @@
                 updatePosition(event.latLng);
             });
 
-            // Attempt to auto-detect on initial load
             autoDetect();
         }
 
         function updatePosition(latLng) {
             if (marker) { marker.setMap(null); }
-            
+
             marker = new google.maps.Marker({
                 position: latLng,
                 map: map,
@@ -116,10 +115,10 @@
         function saveToInput(latLng) {
             const lat = latLng.lat();
             const lng = latLng.lng();
-            
+
             selectedLocation = { lat, lng };
             document.getElementById('location-input').value = `${lat},${lng}`;
-            
+
             document.getElementById('location-display').innerHTML = `
                 <div class="flex items-center justify-between text-xs">
                     <span class="text-green-600 font-bold uppercase tracking-tighter">✓ Position Locked</span>
@@ -129,18 +128,13 @@
 
         function autoDetect() {
             if (!navigator.geolocation) {
-                alert("Your browser does not support location services.");
+                document.getElementById('location-display').innerHTML =
+                    `<p class="text-xs text-red-500 text-center font-semibold">Your browser does not support location services.</p>`;
                 return;
             }
 
             const detectText = document.getElementById('detect-text');
             detectText.innerText = '⏳ Locating...';
-
-            const geoOptions = {
-                enableHighAccuracy: true,
-                timeout: 8000,
-                maximumAge: 0
-            };
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
@@ -148,21 +142,33 @@
                     map.setCenter(loc);
                     map.setZoom(17);
                     updatePosition(loc);
-                    detectText.innerText = '📍 Refresh Location';
+                    detectText.innerText = '📍 Use My Location';
                 },
                 (err) => {
-                    detectText.innerText = '📍 Refresh Location';
-                    let errorMsg = "Unable to detect location.";
-                    
-                    if (err.code === 1) errorMsg = "Location denied. Check browser permissions.";
-                    if (err.code === 3) errorMsg = "GPS timeout. Try again or tap the map.";
-                    
-                    document.getElementById('location-display').innerHTML = 
+                    detectText.innerText = '📍 Use My Location';
+                    let errorMsg = "Unable to detect location. Tap the map to pin manually.";
+                    if (err.code === 1) errorMsg = "Location denied. Please allow location access in your browser settings, then click 'Use My Location' again.";
+                    if (err.code === 3) errorMsg = "GPS timeout. Try again or tap the map to pin manually.";
+                    document.getElementById('location-display').innerHTML =
                         `<p class="text-xs text-red-500 text-center font-semibold">${errorMsg}</p>`;
-                }, 
-                geoOptions
+                },
+                { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
             );
         }
+
+        // Photo preview
+        document.getElementById('photo-input').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('photo-preview').src = e.target.result;
+                    document.getElementById('photo-preview').classList.remove('hidden');
+                    document.getElementById('photo-placeholder').classList.add('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
         document.getElementById('detect-location').addEventListener('click', autoDetect);
 
@@ -170,7 +176,7 @@
             const locationValue = document.getElementById('location-input').value;
             if (!selectedLocation || !locationValue) {
                 e.preventDefault();
-                alert('Please pin the location on the map before submitting.');
+                alert('Please pin your location on the map before submitting.');
             }
         });
     </script>
