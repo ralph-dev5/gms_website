@@ -8,7 +8,7 @@
                 </h1>
             </div>
 
-            <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="p-8 space-y-8">
+            <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" class="p-8 space-y-8" id="reportForm">
                 @csrf
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -77,7 +77,6 @@
         let map, marker, selectedLocation = null;
 
         function initMap() {
-            // Default center (Magallanes area)
             const defaultLocation = { lat: 12.6685, lng: 123.8812 };
 
             map = new google.maps.Map(document.getElementById('map'), {
@@ -88,31 +87,41 @@
                 styles: [{ featureType: "poi", elementType: "labels", stylers: [{ visibility: "off" }] }]
             });
 
+            // Map click listener
             map.addListener('click', (event) => {
-                placeMarker(event.latLng);
+                updatePosition(event.latLng);
             });
 
-            // TRIGGER AUTO-LOCATION ON LOAD
             autoDetect();
         }
 
-        function placeMarker(location) {
+        // Shared function to update marker and internal state
+        function updatePosition(latLng) {
             if (marker) { marker.setMap(null); }
+            
             marker = new google.maps.Marker({
-                position: location,
+                position: latLng,
                 map: map,
                 draggable: true,
                 animation: google.maps.Animation.DROP,
             });
-            marker.addListener('dragend', (event) => updateLocation(event.latLng));
-            updateLocation(location);
+
+            // Handle manual drag of the marker
+            marker.addListener('dragend', (event) => {
+                saveToInput(event.latLng);
+            });
+
+            saveToInput(latLng);
         }
 
-        function updateLocation(latLng) {
+        function saveToInput(latLng) {
             const lat = latLng.lat();
             const lng = latLng.lng();
+            
+            // CRITICAL: Update both the global variable AND the hidden input field
             selectedLocation = { lat, lng };
             document.getElementById('location-input').value = `${lat},${lng}`;
+            
             document.getElementById('location-display').innerHTML = `
                 <div class="flex items-center justify-between text-xs">
                     <span class="text-green-600 font-bold uppercase tracking-tighter">✓ Position Locked</span>
@@ -123,37 +132,32 @@
         function autoDetect() {
             if (!navigator.geolocation) return;
 
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-
             document.getElementById('detect-text').innerText = '⏳ Locating...';
 
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const loc = { lat: position.coords.latitude, lng: position.coords.longitude };
+                    const loc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
                     map.setCenter(loc);
                     map.setZoom(17);
-                    placeMarker(loc);
+                    updatePosition(loc);
                     document.getElementById('detect-text').innerText = '📍 Refresh Location';
                 },
                 (err) => {
-                    console.warn(`ERROR(${err.code}): ${err.message}`);
                     document.getElementById('detect-text').innerText = '📍 Pin Manually';
-                    document.getElementById('location-display').innerHTML = '<p class="text-xs text-red-500 text-center">Cannot detect location. Please tap the map.</p>';
+                    document.getElementById('location-display').innerHTML = '<p class="text-xs text-red-500 text-center">Auto-location failed. Please tap the map to pin.</p>';
                 }, 
-                options
+                { enableHighAccuracy: true, timeout: 5000 }
             );
         }
 
         document.getElementById('detect-location').addEventListener('click', autoDetect);
 
-        document.querySelector('form').addEventListener('submit', (e) => {
-            if (!selectedLocation) {
+        // Validation before submission
+        document.getElementById('reportForm').addEventListener('submit', (e) => {
+            const locationValue = document.getElementById('location-input').value;
+            if (!selectedLocation || !locationValue) {
                 e.preventDefault();
-                alert('Please pin the garbage location on the map first.');
+                alert('Please pin the garbage location on the map before submitting.');
             }
         });
     </script>
