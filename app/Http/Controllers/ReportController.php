@@ -23,14 +23,10 @@ class ReportController extends Controller
         unset($data['street']);
 
         if ($request->hasFile('image')) {
-            $cloudinaryUrl = env('CLOUDINARY_URL');
-            $parsed = parse_url($cloudinaryUrl);
             $cloudinary = new \Cloudinary\Cloudinary([
-                'cloud' => [
-                    'cloud_name' => ltrim($parsed['host'], '/'),
-                    'api_key'    => $parsed['user'],
-                    'api_secret' => $parsed['pass'],
-                ],
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key' => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
             ]);
             $result = $cloudinary->uploadApi()->upload(
                 $request->file('image')->getRealPath(),
@@ -38,7 +34,6 @@ class ReportController extends Controller
             );
             $data['image'] = $result['secure_url'];
         }
-
         \App\Models\Report::create($data);
 
         return redirect()->route('dashboard')->with('success', 'Report submitted successfully!');
