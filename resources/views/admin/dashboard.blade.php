@@ -3,7 +3,7 @@
 
     @include('admin.partials.sidebar')
 
-    <main class="flex-1 p-4 md:p-10 min-w-0">
+    <main class="flex-1 p-4 pt-16 md:pt-10 md:p-10 min-w-0">
 
         <div class="flex justify-between items-center mb-2">
             <h1 class="text-2xl md:text-3xl font-bold pl-2">
