@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.4",
         "cloudinary-labs/cloudinary-laravel": "^3.0",
+        "craftsys/msg91-laravel": "^0.16.0",
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.25",
         "laravel/tinker": "^2.10.1"

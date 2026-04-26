@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
@@ -9,6 +10,20 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+
+// Phone Registration
+Route::get('/register/phone', [OtpController::class, 'showPhoneRegister'])->name('otp.register');
+Route::post('/register/phone/send', [OtpController::class, 'sendRegisterOtp'])->name('otp.register.send');
+Route::get('/register/phone/verify', [OtpController::class, 'showRegisterVerifyForm'])->name('otp.register.verify.form');
+Route::post('/register/phone/verify', [OtpController::class, 'verifyRegisterOtp'])->name('otp.register.verify');
+
+
+// OTP Login
+Route::get('/login/otp', [OtpController::class, 'showOtpLogin'])->name('otp.login');
+Route::post('/login/otp/send', [OtpController::class, 'sendOtp'])->name('otp.send');
+Route::get('/login/otp/verify', [OtpController::class, 'showVerifyForm'])->name('otp.verify.form');
+Route::post('/login/otp/verify', [OtpController::class, 'verifyOtp'])->name('otp.verify');
 
 /*
 |--------------------------------------------------------------------------
