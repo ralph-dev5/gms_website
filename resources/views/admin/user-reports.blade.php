@@ -50,7 +50,7 @@
                                     {{ ucfirst(str_replace('_', ' ', $report->status)) }}
                                 </span>
                             </td>
-                            <td class="p-3 text-gray-500">{{ $report->created_at->format('M d, Y') }}</td>
+                            <td class="p-3 text-gray-500">{{ $report->created_at->format('M d, Y h:i A') }}</td>
                         </tr>
                         @empty
                         <tr>
