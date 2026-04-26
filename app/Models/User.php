@@ -22,8 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'profile_photo_path',
-        'google_id',    // ← added
-        'phone',        // ← added
+        'google_id',
+        'phone',
     ];
 
     /**
@@ -52,9 +52,12 @@ class User extends Authenticatable
     public function getProfilePhotoUrlAttribute(): string
     {
         if ($this->profile_photo_path) {
-            return asset('storage/'.$this->profile_photo_path);
+            if (str_starts_with($this->profile_photo_path, 'http')) {
+                return $this->profile_photo_path;
+            }
+            return asset('storage/' . $this->profile_photo_path);
         }
 
-        return 'https://ui-avatars.com/api/?name='.urlencode($this->name);
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name);
     }
 }

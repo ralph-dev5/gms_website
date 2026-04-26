@@ -29,15 +29,27 @@ class UserController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'profile_photo' => 'nullable|image|max:2048', // optional
+            'profile_photo' => 'nullable|image|max:2048',
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
 
         if ($request->hasFile('profile_photo')) {
-            $path = $request->file('profile_photo')->store('profile-photos', 'public');
-            $user->profile_photo_path = $path;
+            $cloudinary = new \Cloudinary\Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+            ]);
+
+            $result = $cloudinary->uploadApi()->upload(
+                $request->file('profile_photo')->getRealPath(),
+                ['folder' => 'profile-photos']
+            );
+
+            $user->profile_photo_path = $result['secure_url'];
         }
 
         $user->save();
@@ -55,7 +67,7 @@ class UserController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (! Hash::check($request->current_password, $user->password)) {
+        if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.']);
         }
 
