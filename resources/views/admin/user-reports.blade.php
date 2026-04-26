@@ -20,7 +20,7 @@
                             <th class="p-3">Street</th>
                             <th class="p-3">Location</th>
                             <th class="p-3">Status</th>
-                            <th class="p-3">Date</th>
+                            <th class="p-3">Date & Time</th>
                         </tr>
                     </thead>
                     <tbody>
