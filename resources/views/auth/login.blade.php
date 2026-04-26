@@ -33,9 +33,8 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="text-sm font-medium text-gray-700">Password</label>
-                        <a href="{{ route('password.request') }}" class="text-xs text-green-600 hover:underline">
-                            Forgot password?
-                        </a>
+                        <a href="{{ route('password.request') }}" class="text-xs text-green-600 hover:underline">Forgot
+                            password?</a>
                     </div>
                     <div class="relative">
                         <input type="password" name="password" id="password" placeholder="••••••••" required

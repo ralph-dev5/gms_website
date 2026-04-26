@@ -8,58 +8,10 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingsController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Password;
-
-// Show forgot password form
-Route::get('/forgot-password', function () {
-    return view('auth.forgot-password');
-})->name('password.request');
-
-// Send reset link
-Route::post('/forgot-password', function (Request $request) {
-    $request->validate(['email' => 'required|email']);
-    Password::sendResetLink($request->only('email'));
-    return back()->with('status', 'If your email exists, a reset link has been sent.');
-})->name('password.email');
-
-// Show reset form
-Route::get('/reset-password/{token}', function (string $token) {
-    return view('auth.reset-password', ['token' => $token]);
-})->name('password.reset');
-
-// Handle reset
-Route::post('/reset-password', function (Request $request) {
-    $request->validate([
-        'token' => 'required',
-        'email' => 'required|email',
-        'password' => 'required|confirmed|min:8',
-    ]);
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function ($user, $password) {
-            $user->forceFill(['password' => bcrypt($password)])->save();
-        }
-    );
-    return $status === Password::PASSWORD_RESET
-        ? redirect()->route('login')->with('status', 'Password reset successfully!')
-        : back()->withErrors(['email' => __($status)]);
-})->name('password.update');
-
-
-// Phone Registration
-Route::get('/register/phone', [OtpController::class, 'showPhoneRegister'])->name('otp.register');
-Route::post('/register/phone/send', [OtpController::class, 'sendRegisterOtp'])->name('otp.register.send');
-Route::get('/register/phone/verify', [OtpController::class, 'showRegisterVerifyForm'])->name('otp.register.verify.form');
-Route::post('/register/phone/verify', [OtpController::class, 'verifyRegisterOtp'])->name('otp.register.verify');
-
-
-// OTP Login
-Route::get('/login/otp', [OtpController::class, 'showOtpLogin'])->name('otp.login');
-Route::post('/login/otp/send', [OtpController::class, 'sendOtp'])->name('otp.send');
-Route::get('/login/otp/verify', [OtpController::class, 'showVerifyForm'])->name('otp.verify.form');
-Route::post('/login/otp/verify', [OtpController::class, 'verifyOtp'])->name('otp.verify');
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,13 +59,67 @@ Route::view('/', 'welcome');
 |--------------------------------------------------------------------------
 */
 Route::prefix('auth')->group(function () {
-
     Route::get('{provider}/redirect', [SocialiteController::class, 'redirectToProvider'])
         ->name('social.redirect');
-
     Route::get('{provider}/callback', [SocialiteController::class, 'handleProviderCallback'])
         ->name('social.callback');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Forgot Password
+|--------------------------------------------------------------------------
+*/
+Route::get('/forgot-password', function () {
+    return view('auth.forgot-password');
+})->name('password.request');
+
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+    Password::sendResetLink($request->only('email'));
+    return back()->with('status', 'If your email exists, a reset link has been sent.');
+})->name('password.email');
+
+Route::get('/reset-password/{token}', function (string $token) {
+    return view('auth.reset-password', ['token' => $token]);
+})->name('password.reset');
+
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email',
+        'password' => 'required|confirmed|min:8',
+    ]);
+    $status = Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill(['password' => bcrypt($password)])->save();
+        }
+    );
+    return $status === Password::PASSWORD_RESET
+        ? redirect()->route('login')->with('status', 'Password reset successfully!')
+        : back()->withErrors(['email' => __($status)]);
+})->name('password.update');
+
+/*
+|--------------------------------------------------------------------------
+| OTP Login
+|--------------------------------------------------------------------------
+*/
+Route::get('/login/otp', [OtpController::class, 'showOtpLogin'])->name('otp.login');
+Route::post('/login/otp/send', [OtpController::class, 'sendOtp'])->name('otp.send');
+Route::get('/login/otp/verify', [OtpController::class, 'showVerifyForm'])->name('otp.verify.form');
+Route::post('/login/otp/verify', [OtpController::class, 'verifyOtp'])->name('otp.verify');
+
+/*
+|--------------------------------------------------------------------------
+| Phone Registration
+|--------------------------------------------------------------------------
+*/
+Route::get('/register/phone', [OtpController::class, 'showPhoneRegister'])->name('otp.register');
+Route::post('/register/phone/send', [OtpController::class, 'sendRegisterOtp'])->name('otp.register.send');
+Route::get('/register/phone/verify', [OtpController::class, 'showRegisterVerifyForm'])->name('otp.register.verify.form');
+Route::post('/register/phone/verify', [OtpController::class, 'verifyRegisterOtp'])->name('otp.register.verify');
 
 /*
 |--------------------------------------------------------------------------
@@ -122,26 +128,19 @@ Route::prefix('auth')->group(function () {
 */
 
 // Register
-Route::get('/register', [RegisteredUserController::class, 'create'])
-    ->name('register');
-
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
 Route::post('/register', [RegisteredUserController::class, 'store']);
 
 // Login
-Route::get('/login', [LoginController::class, 'showLogin'])
-    ->name('login');
-
+Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 
 // Logout
 Route::post('/logout', function () {
-
     Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
-
     return redirect('/login');
-
 })->name('logout');
 
 /*
@@ -151,45 +150,22 @@ Route::post('/logout', function () {
 */
 Route::middleware('auth')->group(function () {
 
-    /*
-    |--------------------------------------------------------------------------
-    | User Dashboard
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-        ->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Reports
-    |--------------------------------------------------------------------------
-    */
+    // Reports
     Route::prefix('reports')->group(function () {
-
-        Route::get('/', [ReportController::class, 'index'])
-            ->name('reports.index');
-
-        Route::get('/create', [ReportController::class, 'create'])
-            ->name('reports.create');
-
-        Route::post('/', [ReportController::class, 'store'])
-            ->name('reports.store');
-
-        Route::delete('/{id}', [ReportController::class, 'destroy'])
-            ->name('reports.destroy');
-
-        Route::get('/deleted', [ReportController::class, 'deleted'])
-            ->name('reports.deleted');
-
+        Route::get('/', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/create', [ReportController::class, 'create'])->name('reports.create');
+        Route::post('/', [ReportController::class, 'store'])->name('reports.store');
+        Route::delete('/{id}', [ReportController::class, 'destroy'])->name('reports.destroy');
+        Route::get('/deleted', [ReportController::class, 'deleted'])->name('reports.deleted');
     });
 
-    /*
-    |--------------------------------------------------------------------------
-    | User Settings
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/settings', [SettingsController::class, 'index'])
-        ->name('settings');
+    // Settings
+    Route::get('/settings', [\App\Http\Controllers\UserController::class, 'settings'])->name('settings');
+    Route::put('/settings/profile', [\App\Http\Controllers\UserController::class, 'updateProfile'])->name('settings.updateProfile');
+    Route::put('/settings/password', [\App\Http\Controllers\UserController::class, 'updatePassword'])->name('settings.updatePassword');
 });
 
 /*
@@ -200,47 +176,13 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->group(function () {
-
-        Route::get('/dashboard', [AdminController::class, 'dashboard'])
-            ->name('admin.dashboard');
-
-        Route::get('/analytics', [AdminController::class, 'analytics'])
-            ->name('analytics');
-
-        Route::get('/deleted-reports', [AdminController::class, 'deletedReports'])
-            ->name('deleted-reports');
-
-        Route::get('/settings', [AdminController::class, 'settings'])
-            ->name('admin.settings');
-
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+        Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
+        Route::get('/deleted-reports', [AdminController::class, 'deletedReports'])->name('deleted-reports');
+        Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
-
-        Route::get('/users/{id}/reports', [AdminController::class, 'userReports'])
-            ->name('admin.users.reports');
-
-        Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])
-            ->name('admin.users.delete');
-
-        Route::put('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])
-            ->name('admin.reports.updateStatus');
-
-        Route::delete('/reports/{id}', [AdminController::class, 'destroyReport'])
-            ->name('admin.reports.destroy');
-
+        Route::get('/users/{id}/reports', [AdminController::class, 'userReports'])->name('admin.users.reports');
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+        Route::put('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])->name('admin.reports.updateStatus');
+        Route::delete('/reports/{id}', [AdminController::class, 'destroyReport'])->name('admin.reports.destroy');
     });
-
-Route::middleware('auth')->group(function () {
-
-    // Show Settings Page
-    Route::get('/settings', [\App\Http\Controllers\UserController::class, 'settings'])
-        ->name('settings');
-
-    // Update Profile Info
-    Route::put('/settings/profile', [\App\Http\Controllers\UserController::class, 'updateProfile'])
-        ->name('settings.updateProfile');
-
-    // Update Password
-    Route::put('/settings/password', [\App\Http\Controllers\UserController::class, 'updatePassword'])
-        ->name('settings.updatePassword');
-
-});
