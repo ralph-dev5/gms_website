@@ -42,9 +42,9 @@ class AdminController extends Controller
      */
     public function analytics(Request $request)
     {
-        $totalUsers = User::count();
-        $totalReports = Report::count();
-        $pendingReports = Report::where('status', 'pending')->count();
+        $totalUsers      = User::count();
+        $totalReports    = Report::count();
+        $pendingReports  = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
 
         // Handle date range filter
@@ -53,11 +53,11 @@ class AdminController extends Controller
         switch ($range) {
             case 'today':
                 $startDate = now()->startOfDay();
-                $endDate = now()->endOfDay();
+                $endDate   = now()->endOfDay();
                 break;
             case 'week':
                 $startDate = now()->startOfWeek();
-                $endDate = now()->endOfWeek();
+                $endDate   = now()->endOfWeek();
                 break;
             case 'custom':
                 $startDate = $request->start_date
@@ -70,17 +70,17 @@ class AdminController extends Controller
             case 'month':
             default:
                 $startDate = now()->startOfMonth();
-                $endDate = now()->endOfMonth();
+                $endDate   = now()->endOfMonth();
                 break;
         }
 
         // Monthly reports per street (current year), fewest to most
         $monthlyStreetReports = Report::selectRaw('
-        YEAR(created_at) as year,
-        MONTH(created_at) as month,
-        title as street,
-        COUNT(*) as total
-    ')
+                YEAR(created_at) as year,
+                MONTH(created_at) as month,
+                title as street,
+                COUNT(*) as total
+            ')
             ->whereNotNull('title')
             ->whereYear('created_at', now()->year)
             ->groupBy('year', 'month', 'title')
@@ -90,6 +90,17 @@ class AdminController extends Controller
             ->groupBy(function ($item) {
                 return $item->year . '-' . $item->month;
             });
+
+        return view('admin.analytics', compact(
+            'totalUsers',
+            'totalReports',
+            'pendingReports',
+            'resolvedReports',
+            'monthlyStreetReports',
+            'startDate',
+            'endDate',
+            'range'
+        ));
     }
 
     /**
@@ -118,7 +129,7 @@ class AdminController extends Controller
      */
     public function userReports($id)
     {
-        $user = User::findOrFail($id);
+        $user    = User::findOrFail($id);
         $reports = Report::where('user_id', $id)->latest()->get();
 
         return view('admin.user-reports', compact('user', 'reports'));
@@ -131,7 +142,6 @@ class AdminController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Prevent deleting admin users
         if ($user->role === 'admin') {
             return back()->with('error', 'Admin users cannot be deleted.');
         }
