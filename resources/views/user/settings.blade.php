@@ -3,7 +3,7 @@
 
     @include('partials.user-sidebar')
 
-    <main class="flex-1 p-10">
+    <main class="flex-1 p-10 pt-16 md:pt-10">
         <h1 class="text-3xl font-bold mb-6">Settings</h1>
 
         @if(session('success'))
@@ -41,7 +41,7 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
-                        @if($user->profile_photo_path)  
+                        @if($user->profile_photo_path)
                         @endif
                         <input type="file" name="profile_photo" accept="image/*"
                             class="w-full border rounded-lg px-4 py-2">

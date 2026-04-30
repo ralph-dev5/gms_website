@@ -3,7 +3,7 @@
 
     @include('partials.user-sidebar')
 
-    <main class="flex-1 p-10">
+    <main class="flex-1 p-10 pt-16 md:pt-10">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Deleted Reports</h1>
         <p class="text-gray-600 mb-8">Reports you have deleted.</p>
 
