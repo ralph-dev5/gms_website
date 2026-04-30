@@ -28,7 +28,7 @@
         </div>
 
         {{-- Street Report Rankings --}}
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
                 <h2 class="text-xl font-bold text-gray-800">Street Report Rankings</h2>
                 <p class="text-gray-500 text-sm mt-1">
@@ -36,8 +36,8 @@
                 </p>
             </div>
 
-            {{-- Range Filter Buttons --}}
-            <form method="GET" action="{{ route('analytics') }}" id="range-form">
+            {{-- Range Filter --}}
+            <form method="GET" action="{{ route('analytics') }}">
                 <div class="flex flex-wrap gap-2">
                     @foreach(['today' => 'Today', 'week' => 'Week', 'month' => 'Month', 'custom' => 'Custom'] as $key => $label)
                     <button type="submit" name="range" value="{{ $key }}"
@@ -50,7 +50,6 @@
                     @endforeach
                 </div>
 
-                {{-- Custom Date Inputs --}}
                 @if($range === 'custom')
                 <div class="flex flex-wrap gap-3 mt-3 items-center">
                     <input type="date" name="start_date"
@@ -77,9 +76,7 @@
         @else
             <div class="space-y-6">
                 @foreach($monthlyStreetReports as $key => $streets)
-                @php
-                    [$year, $month] = explode('-', $key);
-                @endphp
+                @php [$year, $month] = explode('-', $key); @endphp
                 <div class="bg-white shadow rounded-lg overflow-hidden">
 
                     <div class="bg-green-600 px-6 py-3">
