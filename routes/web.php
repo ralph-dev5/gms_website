@@ -11,6 +11,14 @@ use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+
+Route::get('/clear-cache', function() {
+    \Artisan::call('view:clear');
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    return 'All cache cleared!';
+});
+
 /*
 |--------------------------------------------------------------------------
 | Test Route
