@@ -11,36 +11,9 @@ use App\Http\Controllers\SettingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Cache Clear
-|--------------------------------------------------------------------------
-*/
-Route::get('/clear-cache', function () {
-    \Artisan::call('view:clear');
-    \Artisan::call('cache:clear');
-    \Artisan::call('config:clear');
-    return 'All cache cleared!';
-});
 
-/*
-|--------------------------------------------------------------------------
-| Debug Analytics
-|--------------------------------------------------------------------------
-*/
-Route::get('/debug-analytics', function () {
-    try {
-        $controller = new \App\Http\Controllers\AdminController();
-        $request = \Illuminate\Http\Request::capture();
-        return $controller->analytics($request);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'error' => $e->getMessage(),
-            'file'  => $e->getFile(),
-            'line'  => $e->getLine(),
-        ]);
-    }
-});
+
+
 
 /*
 |--------------------------------------------------------------------------
