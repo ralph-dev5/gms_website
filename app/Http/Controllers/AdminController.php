@@ -11,6 +11,35 @@ class AdminController extends Controller
     /**
      * Admin Dashboard
      */
+    public function dashboard()
+    {
+        $reports = Report::with('user')
+            ->latest()
+            ->get();
+
+        return view('admin.dashboard', compact('reports'));
+    }
+
+    /**
+     * Show all registered users with search
+     */
+    public function users(Request $request)
+    {
+        $search = $request->search;
+
+        $users = User::when($search, function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+        })
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.users', compact('users', 'search'));
+    }
+
+    /**
+     * Analytics page
+     */
     public function analytics(Request $request)
     {
         $totalUsers = User::count();
@@ -42,14 +71,15 @@ class AdminController extends Controller
                 break;
         }
 
+        // Monthly reports per street (current year), fewest to most
         $monthlyStreetReports = Report::selectRaw('
-            YEAR(created_at) as year,
-            MONTH(created_at) as month,
-            title as street,
-            COUNT(*) as total
-        ')
+                YEAR(created_at) as year,
+                MONTH(created_at) as month,
+                title as street,
+                COUNT(*) as total
+            ')
             ->whereNotNull('title')
-            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereYear('created_at', now()->year)
             ->groupBy('year', 'month', 'title')
             ->orderBy('month')
             ->orderBy('total')
