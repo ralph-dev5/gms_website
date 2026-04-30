@@ -40,12 +40,39 @@ class AdminController extends Controller
     /**
      * Analytics page
      */
-    public function analytics()
+    public function analytics(Request $request)
     {
         $totalUsers = User::count();
         $totalReports = Report::count();
         $pendingReports = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
+
+        // Handle date range filter
+        $range = $request->get('range', 'month');
+
+        switch ($range) {
+            case 'today':
+                $startDate = now()->startOfDay();
+                $endDate = now()->endOfDay();
+                break;
+            case 'week':
+                $startDate = now()->startOfWeek();
+                $endDate = now()->endOfWeek();
+                break;
+            case 'custom':
+                $startDate = $request->start_date
+                    ? \Carbon\Carbon::parse($request->start_date)->startOfDay()
+                    : now()->startOfMonth();
+                $endDate = $request->end_date
+                    ? \Carbon\Carbon::parse($request->end_date)->endOfDay()
+                    : now()->endOfMonth();
+                break;
+            case 'month':
+            default:
+                $startDate = now()->startOfMonth();
+                $endDate = now()->endOfMonth();
+                break;
+        }
 
         // Monthly reports per street (current year), fewest to most
         $monthlyStreetReports = Report::selectRaw('
@@ -66,7 +93,10 @@ class AdminController extends Controller
             'totalReports',
             'pendingReports',
             'resolvedReports',
-            'monthlyStreetReports'
+            'monthlyStreetReports',
+            'startDate',
+            'endDate',
+            'range'
         ));
     }
 
