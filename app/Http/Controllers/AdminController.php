@@ -76,28 +76,20 @@ class AdminController extends Controller
 
         // Monthly reports per street (current year), fewest to most
         $monthlyStreetReports = Report::selectRaw('
-                MONTH(created_at) as month,
-                title as street,
-                COUNT(*) as total
-            ')
+        YEAR(created_at) as year,
+        MONTH(created_at) as month,
+        title as street,
+        COUNT(*) as total
+    ')
             ->whereNotNull('title')
             ->whereYear('created_at', now()->year)
-            ->groupBy('month', 'title')
+            ->groupBy('year', 'month', 'title')
             ->orderBy('month')
             ->orderBy('total')
             ->get()
-            ->groupBy('month');
-
-        return view('admin.analytics', compact(
-            'totalUsers',
-            'totalReports',
-            'pendingReports',
-            'resolvedReports',
-            'monthlyStreetReports',
-            'startDate',
-            'endDate',
-            'range'
-        ));
+            ->groupBy(function ($item) {
+                return $item->year . '-' . $item->month;
+            });
     }
 
     /**
