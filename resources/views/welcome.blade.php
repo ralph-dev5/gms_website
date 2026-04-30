@@ -46,7 +46,7 @@
             </p>
             <div class="flex flex-col sm:flex-row gap-3 justify-center px-6">
                 <a href="/login" class="px-8 py-4 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition shadow-lg shadow-green-200 text-center">
-                    Start Reporting Free
+                    Start Reporting 
                 </a>
                 <a href="#how-it-works" class="px-8 py-4 border border-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition text-center">
                     See How It Works

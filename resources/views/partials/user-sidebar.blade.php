@@ -12,7 +12,7 @@
     class="fixed md:static z-40 inset-y-0 left-0 w-64 bg-white shadow-md flex flex-col shrink-0
            transform -translate-x-full md:translate-x-0 transition-transform duration-200">
 
-    <div class="p-6 border-b">
+    <div class="p-6 pt-16 md:pt-6 border-b">
         <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
     </div>
 
@@ -30,5 +30,4 @@
             Deleted Reports
         </a>
     </nav>
-
 </aside>
