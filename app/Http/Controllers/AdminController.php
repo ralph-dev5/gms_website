@@ -49,13 +49,13 @@ class AdminController extends Controller
 
         // Monthly reports per street (current year), fewest to most
         $monthlyStreetReports = Report::selectRaw('
-            MONTH(created_at) as month,
-            location,
-            COUNT(*) as total
-        ')
-            ->whereNotNull('location')
+                MONTH(created_at) as month,
+                title as street,
+                COUNT(*) as total
+            ')
+            ->whereNotNull('title')
             ->whereYear('created_at', now()->year)
-            ->groupBy('month', 'location')
+            ->groupBy('month', 'title')
             ->orderBy('month')
             ->orderBy('total')
             ->get()
@@ -69,6 +69,7 @@ class AdminController extends Controller
             'monthlyStreetReports'
         ));
     }
+
     /**
      * Deleted Reports
      */

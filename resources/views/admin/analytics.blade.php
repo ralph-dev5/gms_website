@@ -40,33 +40,31 @@
                 @foreach($monthlyStreetReports as $month => $streets)
                 <div class="bg-white shadow rounded-lg overflow-hidden">
 
-                    {{-- Month Header --}}
                     <div class="bg-green-600 px-6 py-3">
                         <h3 class="text-white font-semibold text-lg">
                             {{ \Carbon\Carbon::create()->month($month)->format('F') }} {{ now()->year }}
                         </h3>
                     </div>
 
-                    {{-- Streets Table --}}
                     <div class="overflow-x-auto">
                         <table class="w-full text-left min-w-[400px]">
                             <thead class="bg-gray-50 border-b">
                                 <tr>
                                     <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase w-12">#</th>
-                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Street / Location</th>
+                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Street</th>
                                     <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Reports</th>
                                     <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Volume</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @php $max = $streets->max('total'); @endphp
+                                @php $max = $streets->max('total'); $min = $streets->min('total'); @endphp
                                 @foreach($streets as $i => $street)
                                 <tr class="border-b hover:bg-gray-50">
                                     <td class="px-6 py-3 text-gray-400 text-sm">{{ $i + 1 }}</td>
-                                    <td class="px-6 py-3 font-medium text-gray-800">{{ $street->location }}</td>
+                                    <td class="px-6 py-3 font-medium text-gray-800">{{ $street->street }}</td>
                                     <td class="px-6 py-3 text-right">
                                         <span class="inline-block px-2 py-1 rounded text-sm font-bold
-                                            {{ $street->total >= $max ? 'bg-red-100 text-red-600' : ($street->total == $streets->min('total') ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
+                                            {{ $street->total >= $max ? 'bg-red-100 text-red-600' : ($street->total == $min ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
                                             {{ $street->total }}
                                         </span>
                                     </td>
