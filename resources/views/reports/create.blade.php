@@ -3,6 +3,7 @@
         <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
             <div class="bg-green-600 p-6">
                 <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    class="center text-2xl font-bold text-gray-800 mb-2">
                     Report Garbage Issue
                 </h1>
             </div>
