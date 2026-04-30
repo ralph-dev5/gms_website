@@ -12,8 +12,8 @@
     class="fixed md:static z-40 inset-y-0 left-0 w-64 bg-white shadow-lg flex flex-col shrink-0
            transform -translate-x-full md:translate-x-0 transition-transform duration-200">
 
-    <div class="p-6 border-b">
-        <h2 class="text-xl font-bold text-gray-800 pl-8 md:pl-0">Admin Panel</h2>
+    <div class="p-6 border-b pt-16 md:pt-6">
+        <h2 class="text-xl font-bold text-gray-800">Admin Panel</h2>
     </div>
 
     <nav class="flex-1 p-4 space-y-2">
