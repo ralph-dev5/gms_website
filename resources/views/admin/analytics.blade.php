@@ -75,56 +75,53 @@
                 No street report data available for this period.
             </div>
         @else
-            <div class="space-y-6">
-                @foreach($monthlyStreetReports as $key => $streets)
-                @php
-                    $parts = explode('-', $key);
-                    $year  = $parts[0];
-                    $month = $parts[1];
-                    $max   = $streets->max('total');
-                    $min   = $streets->min('total');
-                @endphp
-                <div class="bg-white shadow rounded-lg overflow-hidden">
-                    <div class="bg-green-600 px-6 py-3">
-                        <h3 class="text-white font-semibold text-lg">
-                            {{ \Carbon\Carbon::create($year, $month)->format('F Y') }}
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left min-w-[400px]">
-                            <thead class="bg-gray-50 border-b">
-                                <tr>
-                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase w-12">#</th>
-                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Street</th>
-                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Reports</th>
-                                    <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Volume</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($streets as $street)
-                                <tr class="border-b hover:bg-gray-50">
-                                    <td class="px-6 py-3 text-gray-400 text-sm">{{ $loop->iteration }}</td>
-                                    <td class="px-6 py-3 font-medium text-gray-800">{{ $street->street }}</td>
-                                    <td class="px-6 py-3 text-right">
-                                        <span class="inline-block px-2 py-1 rounded text-sm font-bold
-                                            {{ $street->total >= $max ? 'bg-red-100 text-red-600' : ($street->total == $min ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
-                                            {{ $street->total }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-3 w-40">
-                                        <div class="w-full bg-gray-100 rounded-full h-2">
-                                            <div class="h-2 rounded-full {{ $street->total >= $max ? 'bg-red-500' : 'bg-green-500' }}"
-                                                style="width: {{ $max > 0 ? ($street->total / $max) * 100 : 0 }}%">
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+            @php
+                $max = $monthlyStreetReports->max('total');
+                $min = $monthlyStreetReports->min('total');
+                $sectionLabel = match($range) {
+                    'today'  => 'Today — ' . now()->format('M d, Y'),
+                    'week'   => 'This Week (' . $startDate->format('M d') . ' – ' . $endDate->format('M d, Y') . ')',
+                    'custom' => \Carbon\Carbon::parse(request('custom_month', now()->format('Y-m')) . '-01')->format('F Y'),
+                    default  => now()->format('F Y'),
+                };
+            @endphp
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="bg-green-600 px-6 py-3">
+                    <h3 class="text-white font-semibold text-lg">{{ $sectionLabel }}</h3>
                 </div>
-                @endforeach
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left min-w-[400px]">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase w-12">#</th>
+                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Street</th>
+                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase text-right">Reports</th>
+                                <th class="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($monthlyStreetReports as $i => $street)
+                            <tr class="border-b hover:bg-gray-50">
+                                <td class="px-6 py-3 text-gray-400 text-sm">{{ $i + 1 }}</td>
+                                <td class="px-6 py-3 font-medium text-gray-800">{{ $street->street }}</td>
+                                <td class="px-6 py-3 text-right">
+                                    <span class="inline-block px-2 py-1 rounded text-sm font-bold
+                                        {{ $street->total >= $max ? 'bg-red-100 text-red-600' : ($street->total == $min ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
+                                        {{ $street->total }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-3 w-40">
+                                    <div class="w-full bg-gray-100 rounded-full h-2">
+                                        <div class="h-2 rounded-full {{ $street->total >= $max ? 'bg-red-500' : 'bg-green-500' }}"
+                                            style="width: {{ $max > 0 ? ($street->total / $max) * 100 : 0 }}%">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         @endif
 

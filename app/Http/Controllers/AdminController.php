@@ -71,22 +71,16 @@ class AdminController extends Controller
                 break;
         }
 
-        // Monthly reports per street (current year), fewest to most
+        // Street report rankings filtered by selected date range
         $monthlyStreetReports = Report::selectRaw('
-                YEAR(created_at) as year,
-                MONTH(created_at) as month,
                 title as street,
                 COUNT(*) as total
             ')
             ->whereNotNull('title')
-            ->whereYear('created_at', now()->year)
-            ->groupBy('year', 'month', 'title')
-            ->orderBy('month')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('title')
             ->orderBy('total')
-            ->get()
-            ->groupBy(function ($item) {
-                return $item->year . '-' . $item->month;
-            });
+            ->get();
 
         return view('admin.analytics', compact(
             'totalUsers',
