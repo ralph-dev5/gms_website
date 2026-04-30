@@ -47,14 +47,28 @@ class AdminController extends Controller
         $pendingReports = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
 
+        // Monthly reports per street (current year), fewest to most
+        $monthlyStreetReports = Report::selectRaw('
+            MONTH(created_at) as month,
+            location,
+            COUNT(*) as total
+        ')
+            ->whereNotNull('location')
+            ->whereYear('created_at', now()->year)
+            ->groupBy('month', 'location')
+            ->orderBy('month')
+            ->orderBy('total')
+            ->get()
+            ->groupBy('month');
+
         return view('admin.analytics', compact(
             'totalUsers',
             'totalReports',
             'pendingReports',
-            'resolvedReports'
+            'resolvedReports',
+            'monthlyStreetReports'
         ));
     }
-
     /**
      * Deleted Reports
      */
