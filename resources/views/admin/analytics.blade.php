@@ -27,22 +27,64 @@
             </div>
         </div>
 
-        {{-- Monthly Street Reports --}}
-        <h2 class="text-xl font-bold mb-4 text-gray-800">Monthly Street Report Rankings</h2>
-        <p class="text-gray-500 text-sm mb-6">Streets ranked from fewest to most reports per month ({{ now()->year }}).</p>
+        {{-- Street Report Rankings --}}
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800">Street Report Rankings</h2>
+                <p class="text-gray-500 text-sm mt-1">
+                    {{ $startDate->format('M d, Y') }} — {{ $endDate->format('M d, Y') }}
+                </p>
+            </div>
 
+            {{-- Range Filter Buttons --}}
+            <form method="GET" action="{{ route('analytics') }}" id="range-form">
+                <div class="flex flex-wrap gap-2">
+                    @foreach(['today' => 'Today', 'week' => 'Week', 'month' => 'Month', 'custom' => 'Custom'] as $key => $label)
+                    <button type="submit" name="range" value="{{ $key }}"
+                        class="px-4 py-2 rounded-full text-sm font-semibold border transition
+                            {{ $range === $key
+                                ? 'bg-gray-900 text-white border-gray-900'
+                                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500' }}">
+                        {{ $label }}
+                    </button>
+                    @endforeach
+                </div>
+
+                {{-- Custom Date Inputs --}}
+                @if($range === 'custom')
+                <div class="flex flex-wrap gap-3 mt-3 items-center">
+                    <input type="date" name="start_date"
+                        value="{{ request('start_date') }}"
+                        class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <span class="text-gray-500 text-sm">to</span>
+                    <input type="date" name="end_date"
+                        value="{{ request('end_date') }}"
+                        class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                    <button type="submit"
+                        class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition">
+                        Apply
+                    </button>
+                </div>
+                @endif
+            </form>
+        </div>
+
+        {{-- Street Rankings Table --}}
         @if($monthlyStreetReports->isEmpty())
             <div class="bg-white shadow rounded-lg p-6 text-center text-gray-500">
-                No street report data available.
+                No street report data available for this period.
             </div>
         @else
             <div class="space-y-6">
-                @foreach($monthlyStreetReports as $month => $streets)
+                @foreach($monthlyStreetReports as $key => $streets)
+                @php
+                    [$year, $month] = explode('-', $key);
+                @endphp
                 <div class="bg-white shadow rounded-lg overflow-hidden">
 
                     <div class="bg-green-600 px-6 py-3">
                         <h3 class="text-white font-semibold text-lg">
-                            {{ \Carbon\Carbon::create()->month($month)->format('F') }} {{ now()->year }}
+                            {{ \Carbon\Carbon::create($year, $month)->format('F Y') }}
                         </h3>
                     </div>
 
