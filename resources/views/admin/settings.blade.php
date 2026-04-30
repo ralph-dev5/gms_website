@@ -3,7 +3,7 @@
 
     @include('admin.partials.sidebar')
 
-    <main class="flex-1 p-4 md:p-10 min-w-0">
+    <main class="flex-1 p-4 md:p-10 min-w-0 pt-16 md:pt-10">
         <h1 class="text-2xl md:text-3xl font-bold mb-6">Settings</h1>
 
         @if(session('success'))
