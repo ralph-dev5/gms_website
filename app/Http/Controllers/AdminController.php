@@ -42,9 +42,9 @@ class AdminController extends Controller
      */
     public function analytics(Request $request)
     {
-        $totalUsers      = User::count();
-        $totalReports    = Report::count();
-        $pendingReports  = Report::where('status', 'pending')->count();
+        $totalUsers = User::count();
+        $totalReports = Report::count();
+        $pendingReports = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
 
         // Handle date range filter
@@ -53,24 +53,21 @@ class AdminController extends Controller
         switch ($range) {
             case 'today':
                 $startDate = now()->startOfDay();
-                $endDate   = now()->endOfDay();
+                $endDate = now()->endOfDay();
                 break;
             case 'week':
                 $startDate = now()->startOfWeek();
-                $endDate   = now()->endOfWeek();
+                $endDate = now()->endOfWeek();
                 break;
             case 'custom':
-                $startDate = $request->start_date
-                    ? \Carbon\Carbon::parse($request->start_date)->startOfDay()
-                    : now()->startOfMonth();
-                $endDate = $request->end_date
-                    ? \Carbon\Carbon::parse($request->end_date)->endOfDay()
-                    : now()->endOfMonth();
+                $customMonth = $request->custom_month ?? now()->format('Y-m');
+                $startDate = \Carbon\Carbon::parse($customMonth . '-01')->startOfMonth();
+                $endDate = \Carbon\Carbon::parse($customMonth . '-01')->endOfMonth();
                 break;
             case 'month':
             default:
                 $startDate = now()->startOfMonth();
-                $endDate   = now()->endOfMonth();
+                $endDate = now()->endOfMonth();
                 break;
         }
 
@@ -129,7 +126,7 @@ class AdminController extends Controller
      */
     public function userReports($id)
     {
-        $user    = User::findOrFail($id);
+        $user = User::findOrFail($id);
         $reports = Report::where('user_id', $id)->latest()->get();
 
         return view('admin.user-reports', compact('user', 'reports'));

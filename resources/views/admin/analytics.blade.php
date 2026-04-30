@@ -28,44 +28,45 @@
         </div>
 
         {{-- Street Report Rankings --}}
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-            <div>
-                <h2 class="text-xl font-bold text-gray-800">Street Report Rankings</h2>
-                <p class="text-gray-500 text-sm mt-1">
-                    {{ $startDate->format('M d, Y') }} — {{ $endDate->format('M d, Y') }}
-                </p>
-            </div>
-
-            {{-- Range Filter --}}
-            <form method="GET" action="{{ route('analytics') }}">
-                <div class="flex flex-wrap gap-2">
-                    @foreach(['today' => 'Today', 'week' => 'Week', 'month' => 'Month', 'custom' => 'Custom'] as $key => $label)
-                    <button type="submit" name="range" value="{{ $key }}"
-                        class="px-4 py-2 rounded-full text-sm font-semibold border transition
-                            {{ $range === $key
-                                ? 'bg-gray-900 text-white border-gray-900'
-                                : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500' }}">
-                        {{ $label }}
-                    </button>
-                    @endforeach
+        <div class="bg-white shadow rounded-lg p-6 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Street Report Rankings</h2>
+                    <p class="text-gray-500 text-sm mt-1">
+                        {{ $startDate->format('M d, Y') }} — {{ $endDate->format('M d, Y') }}
+                    </p>
                 </div>
 
-                @if($range === 'custom')
-                <div class="flex flex-wrap gap-3 mt-3 items-center">
-                    <input type="date" name="start_date"
-                        value="{{ request('start_date') }}"
-                        class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <span class="text-gray-500 text-sm">to</span>
-                    <input type="date" name="end_date"
-                        value="{{ request('end_date') }}"
+                {{-- Range Filter Buttons --}}
+                <div class="flex flex-wrap gap-2">
+                    <form method="GET" action="{{ route('analytics') }}" class="flex flex-wrap gap-2">
+                        @foreach(['today' => 'Today', 'week' => 'This Week', 'month' => 'This Month'] as $key => $label)
+                        <button type="submit" name="range" value="{{ $key }}"
+                            class="px-4 py-2 rounded-full text-sm font-semibold border transition
+                                {{ $range === $key
+                                    ? 'bg-gray-900 text-white border-gray-900'
+                                    : 'bg-white text-gray-600 border-gray-300 hover:border-gray-500' }}">
+                            {{ $label }}
+                        </button>
+                        @endforeach
+                    </form>
+                </div>
+            </div>
+
+            {{-- Custom Month Picker --}}
+            <div class="mt-4 pt-4 border-t">
+                <p class="text-sm font-semibold text-gray-600 mb-2">Custom Month:</p>
+                <form method="GET" action="{{ route('analytics') }}" class="flex flex-wrap gap-3 items-center">
+                    <input type="hidden" name="range" value="custom">
+                    <input type="month" name="custom_month"
+                        value="{{ request('custom_month', now()->format('Y-m')) }}"
                         class="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
                     <button type="submit"
                         class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-700 transition">
                         Apply
                     </button>
-                </div>
-                @endif
-            </form>
+                </form>
+            </div>
         </div>
 
         {{-- Street Rankings Table --}}
