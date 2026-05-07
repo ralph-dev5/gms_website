@@ -7,13 +7,9 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -24,15 +20,15 @@ Route::get('/test', function () {
     try {
         return response()->json([
             'status' => 'ok',
-            'php'    => PHP_VERSION,
-            'env'    => app()->environment(),
-            'debug'  => config('app.debug'),
+            'php' => PHP_VERSION,
+            'env' => app()->environment(),
+            'debug' => config('app.debug'),
         ]);
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response()->json([
             'error' => $e->getMessage(),
-            'file'  => $e->getFile(),
-            'line'  => $e->getLine(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
         ], 500);
     }
 });
@@ -43,9 +39,10 @@ Route::get('/test', function () {
 |--------------------------------------------------------------------------
 */
 Route::get('/create-admin', function () {
-    \DB::table('users')->where('email', 'admin@example.com')->update(['is_admin' => 1]);
-    $user = \DB::table('users')->where('email', 'admin@example.com')->first();
-    return 'is_admin = ' . $user->is_admin;
+    DB::table('users')->where('email', 'admin@example.com')->update(['is_admin' => 1]);
+    $user = DB::table('users')->where('email', 'admin@example.com')->first();
+
+    return 'is_admin = '.$user->is_admin;
 });
 
 /*
@@ -106,6 +103,7 @@ Route::post('/logout', function () {
     Auth::logout();
     request()->session()->invalidate();
     request()->session()->regenerateToken();
+
     return redirect('/login');
 })->name('logout');
 
@@ -129,9 +127,9 @@ Route::middleware('auth')->group(function () {
     });
 
     // Settings
-    Route::get('/settings', [\App\Http\Controllers\UserController::class, 'settings'])->name('settings');
-    Route::put('/settings/profile', [\App\Http\Controllers\UserController::class, 'updateProfile'])->name('settings.updateProfile');
-    Route::put('/settings/password', [\App\Http\Controllers\UserController::class, 'updatePassword'])->name('settings.updatePassword');
+    Route::get('/settings', [UserController::class, 'settings'])->name('settings');
+    Route::put('/settings/profile', [UserController::class, 'updateProfile'])->name('settings.updateProfile');
+    Route::put('/settings/password', [UserController::class, 'updatePassword'])->name('settings.updatePassword');
 });
 
 /*
@@ -146,6 +144,8 @@ Route::middleware(['auth', 'admin'])
         Route::get('/analytics', [AdminController::class, 'analytics'])->name('analytics');
         Route::get('/deleted-reports', [AdminController::class, 'deletedReports'])->name('deleted-reports');
         Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+        Route::put('/settings/profile', [AdminController::class, 'updateProfile'])->name('admin.settings.updateProfile');
+        Route::put('/settings/password', [AdminController::class, 'updatePassword'])->name('admin.settings.updatePassword');
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
         Route::get('/users/{id}/reports', [AdminController::class, 'userReports'])->name('admin.users.reports');
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');

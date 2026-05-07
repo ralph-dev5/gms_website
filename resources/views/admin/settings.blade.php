@@ -12,30 +12,74 @@
             </div>
         @endif
 
-        <div class="bg-white shadow rounded-lg p-6 max-w-lg">
-            <h2 class="text-lg font-semibold mb-4">Update Profile</h2>
+        @if($errors->any())
+            <div class="mb-6 p-4 bg-red-100 text-red-700 rounded-lg">
+                {{ $errors->first() }}
+            </div>
+        @endif
 
-            <form method="POST" action="{{ route('settings.updateProfile') }}">
-                @csrf
-                @method('PUT')
+        <div class="space-y-6 max-w-lg">
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                    <input type="text" name="name" value="{{ auth()->user()->name }}"
-                        class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                </div>
+            <!-- Update Profile -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-semibold mb-4">Update Profile</h2>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" name="email" value="{{ auth()->user()->email }}"
-                        class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                </div>
+                <form method="POST" action="{{ route('admin.settings.updateProfile') }}">
+                    @csrf
+                    @method('PUT')
 
-                <button type="submit"
-                    class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold">
-                    Save Changes
-                </button>
-            </form>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                        <input type="text" name="name" value="{{ old('name', auth()->user()->name) }}"
+                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}"
+                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <button type="submit"
+                        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Change Password -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h2 class="text-lg font-semibold mb-4">Change Password</h2>
+
+                <form method="POST" action="{{ route('admin.settings.updatePassword') }}">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+                        <input type="password" name="current_password"
+                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+                        <input type="password" name="password"
+                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+                        <input type="password" name="password_confirmation"
+                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    <button type="submit"
+                        class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold">
+                        Change Password
+                    </button>
+                </form>
+            </div>
+
         </div>
     </main>
 

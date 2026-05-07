@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -61,8 +64,8 @@ class AdminController extends Controller
                 break;
             case 'custom':
                 $customMonth = $request->custom_month ?? now()->format('Y-m');
-                $startDate = \Carbon\Carbon::parse($customMonth . '-01')->startOfMonth();
-                $endDate = \Carbon\Carbon::parse($customMonth . '-01')->endOfMonth();
+                $startDate = Carbon::parse($customMonth.'-01')->startOfMonth();
+                $endDate = Carbon::parse($customMonth.'-01')->endOfMonth();
                 break;
             case 'month':
             default:
@@ -113,6 +116,52 @@ class AdminController extends Controller
     public function settings()
     {
         return view('admin.settings');
+    }
+
+    /**
+     * Update Admin Profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->save();
+
+        return back()->with('success', 'Profile updated successfully.');
+    }
+
+    /**
+     * Update Admin Password
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.']);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Password updated successfully.');
     }
 
     /**
