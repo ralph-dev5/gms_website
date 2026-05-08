@@ -9,38 +9,40 @@ use Illuminate\Support\Facades\Auth;
 
 class RegisteredUserController extends Controller
 {
-    // Show registration form
+    /**
+     * Show the registration form.
+     */
     public function create()
     {
         return view('auth.register');
     }
 
-    // Handle registration
+    /**
+     * Handle the registration request.
+     * Validates input, creates user, logs them in, and redirects to dashboard.
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => [
+            'name'     => 'required|string|max:255',
+            'email'    => [
                 'required',
                 'string',
-                'email',
                 'max:255',
-                'unique:users',
-                'not_in:admin@example.com',
+                'unique:users',          // no duplicate usernames
+                'not_in:admin@example.com', // block reserved username
             ],
             'password' => 'required|string|confirmed|min:8',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => bcrypt($request->password),
         ]);
 
-        // Log the user in
         Auth::login($user);
 
-        // Redirect to dashboard
         return redirect()->route('dashboard');
     }
 }

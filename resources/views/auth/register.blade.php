@@ -28,10 +28,11 @@
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-sm">
             </div>
 
+            <!-- Username (replaces Email Address) -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                <input type="email" name="email" value="{{ old('email') }}"
-                    placeholder="you@example.com" required
+                <label class="block text-sm font-medium text-gray-700 mb-1">User Name</label>
+                <input type="text" name="email" value="{{ old('email') }}"
+                    placeholder="Choose a unique username" required
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-sm">
             </div>
 
