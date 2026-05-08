@@ -38,6 +38,7 @@
 
                 <!-- Password -->
                 <div>
+                    <x-input-label for="password" :value="__('Password')" class="text-sm text-gray-700" />
                     <x-text-input id="password" type="password" name="password" required
                         autocomplete="current-password"
                         placeholder="••••••••••"
