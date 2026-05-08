@@ -6,7 +6,7 @@ use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class AdminController extends Controller
+class AdminReportController extends Controller
 {
     /**
      * Admin Dashboard
