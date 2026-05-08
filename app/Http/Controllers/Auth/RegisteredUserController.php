@@ -6,43 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
-class RegisteredUserController extends Controller
+class RegisterController extends Controller
 {
-    /**
-     * Show the registration form.
-     */
-    public function create()
+    public function showRegister()
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle the registration request.
-     * Validates input, creates user, logs them in, and redirects to dashboard.
-     */
-    public function store(Request $request)
+    public function register(Request $request)
     {
         $request->validate([
             'name'     => 'required|string|max:255',
-            'email'    => [
-                'required',
-                'string',
-                'max:255',
-                'unique:users',          // no duplicate usernames
-                'not_in:admin@example.com', // block reserved username
-            ],
-            'password' => 'required|string|confirmed|min:8',
+            'email'    => 'required|string|max:255|unique:users,email', // no "email" format rule
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
             'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => bcrypt($request->password),
+            'email'    => $request->email,   // storing username in the email column
+            'password' => Hash::make($request->password),
         ]);
 
-        Auth::login($user);
+        // Auto-login after registration, then redirect to login page
+        // Option A: redirect to login so they sign in manually
+        return redirect()->route('login')->with('status', 'Account created! Please sign in.');
 
-        return redirect()->route('dashboard');
+        // Option B: auto-login and go straight to dashboard (uncomment if preferred)
+        // Auth::login($user);
+        // return redirect()->route('dashboard');
     }
 }
