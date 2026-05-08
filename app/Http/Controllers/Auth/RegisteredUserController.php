@@ -20,6 +20,10 @@ class RegisteredUserController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
+        ], [
+            'email.required' => 'The username field is required.',
+            'email.unique'   => 'That username has already been taken.',
+            'email.max'      => 'The username may not be greater than 255 characters.',
         ]);
 
         User::create([

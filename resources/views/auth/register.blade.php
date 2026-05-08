@@ -13,7 +13,7 @@
         <!-- Error Messages -->
         @if($errors->any())
             <div class="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-5 text-sm">
-                {{ $errors->first() }}
+                {{ str_replace('email', 'username', $errors->first()) }}
             </div>
         @endif
 
