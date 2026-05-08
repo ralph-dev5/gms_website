@@ -1,91 +1,89 @@
-<x-layout>
-    <div
-        class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600 p-6">
-        <div class="w-full max-w-md backdrop-blur-xl bg-white/90 border border-white/40 rounded-3xl shadow-2xl p-8">
+<x-guest-layout>
+    <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-100 px-4">
+
+        <!-- Login Card -->
+        <div class="w-full max-w-md bg-white/60 backdrop-blur-md p-8 rounded-2xl shadow-md">
 
             <!-- Header -->
-            <div class="text-center mb-8">
-                <img src="{{ asset('images/logo.png') }}" alt="GMS Logo"
-                    class="w-16 h-16 rounded-full object-cover mx-auto mb-4">
-                <h1 class="text-3xl font-bold text-gray-800">Welcome Back</h1>
-                <p class="text-gray-500 text-sm mt-1">Login to continue to your account</p>
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-extrabold text-green-600">
+                    ♻ Garbage Monitoring System
+                </h1>
+                <p class="mt-1 text-sm text-gray-600">
+                    Login to your account
+                </p>
             </div>
 
-            <!-- Error Messages -->
-            @if($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-600 rounded-xl px-4 py-3 mb-5 text-sm">
-                    {{ $errors->first() }}
-                </div>
-            @endif
+            <!-- Session Status -->
+            <x-auth-session-status class="mb-4 text-sm text-green-600 text-center" :status="session('status')" />
 
-            <!-- Login Form -->
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+            <!-- Traditional Login Form -->
+            <form method="POST" action="{{ route('login') }}" class="space-y-4">
                 @csrf
 
-                <!-- Email -->
+                <!-- User Name -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                    <input type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" required
-                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-sm">
+                    <x-input-label for="email" :value="__('User Name')" class="text-sm text-gray-700" />
+                    <x-text-input id="email" type="email" name="email" :value="old('email')" required autofocus
+                        autocomplete="username"
+                        class="mt-1 block w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500" />
+                    <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs" />
                 </div>
 
                 <!-- Password -->
                 <div>
-                    <div class="relative">
-                        <input type="password" name="password" id="password" placeholder="••••••••" required
-                            class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-sm pr-12">
-                        <button type="button" onclick="togglePassword()"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700">
-                            <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                            </svg>
-                        </button>
-                    </div>
+                    <x-input-label for="password" :value="__('Password')" class="text-sm text-gray-700" />
+                    <x-text-input id="password" type="password" name="password" required
+                        autocomplete="current-password"
+                        class="mt-1 block w-full rounded-lg border-gray-300 focus:border-green-500 focus:ring-green-500" />
+                    <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs" />
                 </div>
 
-                <!-- Sign In Button -->
-                <button type="submit"
-                    class="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 rounded-xl font-semibold text-sm transition shadow-md hover:shadow-lg">
-                    Sign In
-                </button>
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label for="remember_me" class="inline-flex items-center">
+                        <input id="remember_me" type="checkbox" name="remember"
+                            class="rounded border-gray-300 text-green-600 focus:ring-green-500" />
+                        <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+                    </label>
+
+                    @if (Route::has('password.request'))
+                        <a href="{{ route('password.request') }}" class="text-sm text-green-600 hover:underline">
+                            {{ __('Forgot password?') }}
+                        </a>
+                    @endif
+                </div>
+
+                <!-- Login Button -->
+                <x-primary-button
+                    class="w-full justify-center rounded-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 focus:ring-green-500">
+                    {{ __('Log in') }}
+                </x-primary-button>
             </form>
 
-            <!-- Divider -->
-            <div class="flex items-center gap-3 my-5">
-                <div class="flex-1 h-px bg-gray-300"></div>
-                <span class="text-xs text-gray-500">or continue with</span>
-                <div class="flex-1 h-px bg-gray-300"></div>
+            <!-- OR separator -->
+            <div class="flex items-center my-4">
+                <hr class="flex-grow border-gray-300" />
+                <span class="mx-2 text-gray-500 text-sm">OR</span>
+                <hr class="flex-grow border-gray-300" />
             </div>
 
-            <!-- Social & OTP Buttons -->
-            <div class="space-y-3">
-
-                <!-- Google Login -->
-                <a href="{{ route('social.redirect', 'google') }}"
-                    class="flex items-center justify-center gap-3 w-full border border-gray-300 rounded-xl py-3 hover:bg-gray-50 transition text-sm font-medium text-gray-700">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
-                    Sign in with Google
+            <!-- Google Login -->
+            <div class="social-auth-links text-center">
+                <a href="{{ route('google.redirect') }}"
+                   class="inline-flex items-center justify-center w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-green-500 transition">
+                    <i class="fab fa-google mr-2"></i> {{ __('Sign in with Google') }}
                 </a>
-
-
             </div>
 
             <!-- Register Link -->
-            <p class="text-center text-xs text-gray-500 mt-6">
-                Don't have an account?
-                <a href="{{ route('register') }}" class="text-green-600 font-semibold hover:underline">Sign up</a>
+            <p class="mt-6 text-center text-sm text-gray-600">
+                No account yet?
+                <a href="{{ route('register') }}" class="font-semibold text-green-600 hover:underline">
+                    Register
+                </a>
             </p>
 
         </div>
     </div>
-
-    <script>
-        function togglePassword() {
-            const input = document.getElementById('password');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-    </script>
-</x-layout>
+</x-guest-layout>
