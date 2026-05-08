@@ -10,6 +10,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\GoogleController;
+
+
+Route::get('auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
+Route::get('auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +47,7 @@ Route::get('/create-admin', function () {
     DB::table('users')->where('email', 'admin@example.com')->update(['is_admin' => 1]);
     $user = DB::table('users')->where('email', 'admin@example.com')->first();
 
-    return 'is_admin = '.$user->is_admin;
+    return 'is_admin = ' . $user->is_admin;
 });
 
 /*
