@@ -28,9 +28,10 @@
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-sm">
             </div>
 
-            <!-- Username (replaces Email Address) -->
+            <!-- Username -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">User Name</label>
+                {{-- Changed type="email" to type="text" to disable browser email validation --}}
                 <input type="text" name="email" value="{{ old('email') }}"
                     placeholder="Choose a unique username" required
                     class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition text-sm">

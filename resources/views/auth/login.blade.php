@@ -29,7 +29,8 @@
                 <!-- User Name -->
                 <div>
                     <x-input-label for="email" :value="__('User Name')" class="text-sm text-gray-700" />
-                    <x-text-input id="email" type="email" name="email" :value="old('email')" required autofocus
+                    {{-- Changed type="email" to type="text" to disable browser email validation --}}
+                    <x-text-input id="email" type="text" name="email" :value="old('email')" required autofocus
                         autocomplete="username"
                         class="mt-1 block w-full rounded-xl border-gray-200 bg-gray-100 focus:border-green-500 focus:ring-green-500 px-4 py-3" />
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-xs" />
