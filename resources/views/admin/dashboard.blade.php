@@ -37,7 +37,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100 bg-white">
                             @forelse($reports as $report)
-                                <tr class="hover:bg-gray-50/50 transition-colors">
+                                <tr class="hover:bg-gray-50/50 transition-colors {{ $report->trashed() ? 'opacity-60 bg-red-50/30' : '' }}">
                                     <td class="p-4">
                                         @if($report->image)
                                             <div class="relative group">
@@ -52,7 +52,13 @@
                                             </div>
                                         @endif
                                     </td>
-                                    <td class="p-4 font-bold text-gray-700 text-sm">{{ $report->user->name }}</td>
+                                    <td class="p-4 text-sm">
+                                        <div class="font-bold text-gray-700">{{ $report->user->name }}</div>
+                                        {{-- Show badge if user deleted this report --}}
+                                        @if($report->trashed())
+                                            <span class="text-[10px] text-red-500 font-bold uppercase tracking-wide">Deleted by user</span>
+                                        @endif
+                                    </td>
                                     <td class="p-4 text-sm text-gray-600 font-medium">{{ $report->street ?? $report->title }}</td>
                                     <td class="p-4 text-sm">
                                         @if($report->location)
@@ -77,20 +83,25 @@
                                         </span>
                                     </td>
                                     <td class="p-4">
-                                        <form action="{{ route('admin.reports.updateStatus', $report->id) }}" method="POST" class="flex items-center gap-2">
-                                            @csrf
-                                            @method('PUT')
-                                            <select name="status" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-bold focus:ring-2 focus:ring-green-500 transition-all outline-none">
-                                                <option value="pending" {{ $report->status == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="in_progress" {{ $report->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                                                <option value="completed" {{ $report->status == 'completed' ? 'selected' : '' }}>Completed</option>
-                                            </select>
-                                            <button type="submit" class="p-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md shadow-green-100">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                                </svg>
-                                            </button>
-                                        </form>
+                                        {{-- Disable status update for user-deleted reports --}}
+                                        @if(!$report->trashed())
+                                            <form action="{{ route('admin.reports.updateStatus', $report->id) }}" method="POST" class="flex items-center gap-2">
+                                                @csrf
+                                                @method('PUT')
+                                                <select name="status" class="bg-gray-50 border border-gray-200 rounded-lg px-2 py-1.5 text-xs font-bold focus:ring-2 focus:ring-green-500 transition-all outline-none">
+                                                    <option value="pending" {{ $report->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                                    <option value="in_progress" {{ $report->status == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                                                    <option value="completed" {{ $report->status == 'completed' ? 'selected' : '' }}>Completed</option>
+                                                </select>
+                                                <button type="submit" class="p-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md shadow-green-100">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="text-gray-300 text-xs italic">—</span>
+                                        @endif
                                     </td>
                                     <td class="p-4 text-gray-400 text-[11px] font-bold uppercase">{{ $report->created_at->format('M d, Y h:i A') }}</td>
                                     <td class="p-4 text-center">

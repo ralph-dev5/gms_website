@@ -8,10 +8,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user   = auth()->user();
         $userId = $user->id;
 
-        // Counts by status
+        // Counts only active (non-deleted) reports for the user
         $pendingCount = Report::where('user_id', $userId)
             ->where('status', 'pending')
             ->count();
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             ->where('status', 'completed')
             ->count();
 
-        // Get all reports for the logged-in user
+        // Only show active (non-deleted) reports on user dashboard
         $reports = Report::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
