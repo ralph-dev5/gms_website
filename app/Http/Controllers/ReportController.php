@@ -8,34 +8,41 @@ use Cloudinary\Cloudinary;
 
 class ReportController extends Controller
 {
+    /**
+     * Show the create report form.
+     */
     public function create()
     {
         return view('reports.create');
     }
 
+    /**
+     * Redirect to dashboard (reports have no index page).
+     */
     public function index()
     {
         return redirect()->route('dashboard');
     }
 
+    /**
+     * Store a new report.
+     * Uploads image to Cloudinary if provided.
+     */
     public function store(StoreReportRequest $request)
     {
         $data = $request->validated();
 
-        // Preserve existing logic: Set user, status, and move street to title
         $data['user_id'] = auth()->id();
-        $data['status'] = 'pending';
-        $data['title'] = $data['street'];
+        $data['status']  = 'pending';
+        $data['title']   = $data['street'];
+        $data['image']   = null;
         unset($data['street']);
-
-        // Default image to null in case no file is uploaded
-        $data['image'] = null;
 
         if ($request->hasFile('image')) {
             $cloudinary = new Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
             ]);
@@ -45,7 +52,6 @@ class ReportController extends Controller
                 ['folder' => 'reports']
             );
 
-            // CRITICAL FIX: Save the full HTTPS secure URL to the database
             $data['image'] = $result['secure_url'];
         }
 
@@ -54,20 +60,26 @@ class ReportController extends Controller
         return redirect()->route('dashboard')->with('success', 'Report submitted successfully!');
     }
 
+    /**
+     * Soft-delete the user's own report.
+     * Deleted reports go to the user's deleted reports page only.
+     * Admin dashboard is NOT affected.
+     */
     public function destroy($id)
     {
         $report = Report::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
 
-        $report->delete();
+        $report->delete(); // soft delete — hidden from active list, visible in user's deleted reports
 
-        // CHANGE THIS LINE:
-        // From: return redirect()->route('reports.deleted')->with('success', ...);
-        // To:
-        return redirect()->route('dashboard')->with('success', 'Report deleted successfully.');
+        return redirect()->route('reports.deleted')->with('success', 'Report deleted successfully.');
     }
 
+    /**
+     * Show the current user's soft-deleted reports only.
+     * Admin deleted reports are separate and not shown here.
+     */
     public function deleted()
     {
         $reports = Report::onlyTrashed()

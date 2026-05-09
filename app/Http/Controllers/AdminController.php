@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 class AdminController extends Controller
 {
     /**
-     * Admin Dashboard
+     * Admin Dashboard — shows only active (non-deleted) reports.
      */
     public function dashboard()
     {
@@ -24,16 +24,16 @@ class AdminController extends Controller
     }
 
     /**
-     * Show all registered users with search
+     * Show all registered users with optional search.
      */
     public function users(Request $request)
     {
         $search = $request->search;
 
         $users = User::when($search, function ($query) use ($search) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-        })
+                $query->where('name', 'like', "%{$search}%")
+                      ->orWhere('email', 'like', "%{$search}%");
+            })
             ->latest()
             ->paginate(10);
 
@@ -41,44 +41,39 @@ class AdminController extends Controller
     }
 
     /**
-     * Analytics page
+     * Analytics page with date range filtering and street report rankings.
      */
     public function analytics(Request $request)
     {
-        $totalUsers = User::count();
-        $totalReports = Report::count();
-        $pendingReports = Report::where('status', 'pending')->count();
+        $totalUsers      = User::count();
+        $totalReports    = Report::count();
+        $pendingReports  = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
 
-        // Handle date range filter
         $range = $request->get('range', 'month');
 
         switch ($range) {
             case 'today':
                 $startDate = now()->startOfDay();
-                $endDate = now()->endOfDay();
+                $endDate   = now()->endOfDay();
                 break;
             case 'week':
                 $startDate = now()->startOfWeek();
-                $endDate = now()->endOfWeek();
+                $endDate   = now()->endOfWeek();
                 break;
             case 'custom':
                 $customMonth = $request->custom_month ?? now()->format('Y-m');
-                $startDate = Carbon::parse($customMonth.'-01')->startOfMonth();
-                $endDate = Carbon::parse($customMonth.'-01')->endOfMonth();
+                $startDate   = Carbon::parse($customMonth . '-01')->startOfMonth();
+                $endDate     = Carbon::parse($customMonth . '-01')->endOfMonth();
                 break;
             case 'month':
             default:
                 $startDate = now()->startOfMonth();
-                $endDate = now()->endOfMonth();
+                $endDate   = now()->endOfMonth();
                 break;
         }
 
-        // Street report rankings filtered by selected date range
-        $monthlyStreetReports = Report::selectRaw('
-                title as street,
-                COUNT(*) as total
-            ')
+        $monthlyStreetReports = Report::selectRaw('title as street, COUNT(*) as total')
             ->whereNotNull('title')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('title')
@@ -98,7 +93,7 @@ class AdminController extends Controller
     }
 
     /**
-     * Deleted Reports
+     * Admin deleted reports — shows ALL soft-deleted reports from all users.
      */
     public function deletedReports()
     {
@@ -111,7 +106,7 @@ class AdminController extends Controller
     }
 
     /**
-     * Admin Settings
+     * Admin settings page.
      */
     public function settings()
     {
@@ -119,14 +114,14 @@ class AdminController extends Controller
     }
 
     /**
-     * Update Admin Profile
+     * Update admin profile.
      */
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
 
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name'  => 'required|string|max:255',
             'email' => [
                 'required',
                 'email',
@@ -135,7 +130,7 @@ class AdminController extends Controller
             ],
         ]);
 
-        $user->name = $request->name;
+        $user->name  = $request->name;
         $user->email = $request->email;
         $user->save();
 
@@ -143,7 +138,7 @@ class AdminController extends Controller
     }
 
     /**
-     * Update Admin Password
+     * Update admin password.
      */
     public function updatePassword(Request $request)
     {
@@ -151,7 +146,7 @@ class AdminController extends Controller
 
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|string|min:8|confirmed',
+            'password'         => 'required|string|min:8|confirmed',
         ]);
 
         if (! Hash::check($request->current_password, $user->password)) {
@@ -165,18 +160,18 @@ class AdminController extends Controller
     }
 
     /**
-     * View a user's report history
+     * View a specific user's report history.
      */
     public function userReports($id)
     {
-        $user = User::findOrFail($id);
+        $user    = User::findOrFail($id);
         $reports = Report::where('user_id', $id)->latest()->get();
 
         return view('admin.user-reports', compact('user', 'reports'));
     }
 
     /**
-     * Delete User
+     * Delete a user — admin users cannot be deleted.
      */
     public function deleteUser($id)
     {
@@ -192,7 +187,7 @@ class AdminController extends Controller
     }
 
     /**
-     * Update Report Status
+     * Update a report's status.
      */
     public function updateReportStatus(Request $request, $id)
     {
@@ -206,6 +201,9 @@ class AdminController extends Controller
         return back()->with('success', 'Report status updated.');
     }
 
+    /**
+     * Admin hard-deletes a completed report permanently.
+     */
     public function destroyReport($id)
     {
         $report = Report::where('id', $id)

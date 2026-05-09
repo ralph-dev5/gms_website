@@ -30,7 +30,10 @@
                         <td class="p-3">
                             @if($report->location)
                                 <a href="https://www.google.com/maps/search/?api=1&query={{ $report->location }}"
-                                   target="_blank" class="text-blue-600 hover:underline text-sm">View Map</a>
+                                   target="_blank"
+                                   class="text-blue-600 hover:underline text-sm">
+                                   View Map
+                                </a>
                             @else
                                 N/A
                             @endif
@@ -40,11 +43,15 @@
                                 {{ ucfirst(str_replace('_', ' ', $report->status)) }}
                             </span>
                         </td>
-                        <td class="p-3 text-gray-500">{{ $report->deleted_at->format('M d, Y h:i A') }}</td>
+                        <td class="p-3 text-gray-500">
+                            {{ $report->deleted_at->format('M d, Y h:i A') }}
+                        </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="4" class="p-6 text-center text-gray-500">No deleted reports.</td>
+                        <td colspan="4" class="p-6 text-center text-gray-500">
+                            No deleted reports.
+                        </td>
                     </tr>
                     @endforelse
                 </tbody>
