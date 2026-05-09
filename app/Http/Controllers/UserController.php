@@ -8,7 +8,9 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    // Show settings page
+    /**
+     * Show the user settings page.
+     */
     public function settings()
     {
         $user = auth()->user();
@@ -16,30 +18,26 @@ class UserController extends Controller
         return view('user.settings', compact('user'));
     }
 
-    // Update profile info
+    /**
+     * Update profile info.
+     * - Google users: name and email can be updated
+     * - Regular users: name and email are fixed, only profile photo can change
+     */
     public function updateProfile(Request $request)
     {
-        $user = auth()->user();
+        $user     = auth()->user();
+        $isGoogle = !empty($user->google_id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-
+        // Only upload profile photo — name and email are readonly for all users
         if ($request->hasFile('profile_photo')) {
             $cloudinary = new \Cloudinary\Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key' => env('CLOUDINARY_API_KEY'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
             ]);
@@ -54,17 +52,19 @@ class UserController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Profile updated successfully.');
+        return back()->with('success', 'Profile photo updated successfully.');
     }
 
-    // Update password
+    /**
+     * Update password.
+     */
     public function updatePassword(Request $request)
     {
         $user = auth()->user();
 
         $request->validate([
             'current_password' => 'required',
-            'password' => 'required|string|min:8|confirmed',
+            'password'         => 'required|string|min:8|confirmed',
         ]);
 
         if (!Hash::check($request->current_password, $user->password)) {

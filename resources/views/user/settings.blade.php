@@ -27,7 +27,8 @@
             <!-- Update Profile -->
             <div class="bg-white p-6 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4">Update Profile</h2>
-                <form method="POST" action="{{ route('settings.updateProfile') }}" enctype="multipart/form-data" class="space-y-4">
+                <form method="POST" action="{{ route('settings.updateProfile') }}"
+                    enctype="multipart/form-data" class="space-y-4">
                     @csrf
                     @method('PUT')
 
@@ -37,7 +38,6 @@
                         <input type="text" value="{{ $user->name }}"
                             readonly disabled
                             class="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
-                        <input type="hidden" name="name" value="{{ $user->name }}">
                         <p class="text-xs text-gray-400 mt-1">Name cannot be changed.</p>
                     </div>
 
@@ -49,24 +49,33 @@
                         <input type="text" value="{{ $user->email }}"
                             readonly disabled
                             class="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
-                        <input type="hidden" name="email" value="{{ $user->email }}">
                         <p class="text-xs text-gray-400 mt-1">
                             {{ $isGoogle ? 'Email cannot be changed.' : 'Username cannot be changed.' }}
                         </p>
                     </div>
 
-                    {{-- Profile Photo: still editable --}}
+                    {{-- Profile Photo: editable for all users --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
+
+                        {{-- Show current photo if exists --}}
                         @if($user->profile_photo_path)
+                            <div class="mb-2">
+                                <img src="{{ $user->profile_photo_url }}"
+                                    alt="Current Photo"
+                                    class="w-16 h-16 rounded-full object-cover border-2 border-green-500">
+                                <p class="text-xs text-gray-400 mt-1">Current photo</p>
+                            </div>
                         @endif
+
                         <input type="file" name="profile_photo" accept="image/*"
                             class="w-full border rounded-lg px-4 py-2">
+                        <p class="text-xs text-gray-400 mt-1">Max 2MB. JPG, PNG accepted.</p>
                     </div>
 
                     <button type="submit"
                         class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold">
-                        Update Profile
+                        Update Profile Photo
                     </button>
                 </form>
             </div>

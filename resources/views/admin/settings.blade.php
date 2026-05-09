@@ -24,7 +24,8 @@
             <div class="bg-white shadow rounded-lg p-6">
                 <h2 class="text-lg font-semibold mb-4">Update Profile</h2>
 
-                <form method="POST" action="{{ route('admin.settings.updateProfile') }}">
+                <form method="POST" action="{{ route('admin.settings.updateProfile') }}"
+                    enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
@@ -38,6 +39,25 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}"
                             class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    </div>
+
+                    {{-- Profile Photo --}}
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
+
+                        {{-- Show current photo if exists --}}
+                        @if(auth()->user()->profile_photo_path)
+                            <div class="mb-2">
+                                <img src="{{ auth()->user()->profile_photo_url }}"
+                                    alt="Current Photo"
+                                    class="w-16 h-16 rounded-full object-cover border-2 border-green-500">
+                                <p class="text-xs text-gray-400 mt-1">Current photo</p>
+                            </div>
+                        @endif
+
+                        <input type="file" name="profile_photo" accept="image/*"
+                            class="w-full border rounded-lg px-4 py-2">
+                        <p class="text-xs text-gray-400 mt-1">Max 2MB. JPG, PNG accepted.</p>
                     </div>
 
                     <button type="submit"
