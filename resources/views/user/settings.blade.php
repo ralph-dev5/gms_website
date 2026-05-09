@@ -31,34 +31,31 @@
                     @csrf
                     @method('PUT')
 
+                    {{-- Name: readonly for all users --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                        <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <input type="text" value="{{ $user->name }}"
+                            readonly disabled
+                            class="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
+                        <input type="hidden" name="name" value="{{ $user->name }}">
+                        <p class="text-xs text-gray-400 mt-1">Name cannot be changed.</p>
                     </div>
 
+                    {{-- Email/Username: readonly for all users --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             {{ $isGoogle ? 'Email' : 'Username' }}
                         </label>
-
-                        @if($isGoogle)
-                            {{-- Google users can edit their email --}}
-                            <input type="email" name="email"
-                                value="{{ old('email', $user->email) }}"
-                                class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        @else
-                            {{-- Regular users cannot edit their username --}}
-                            <input type="text"
-                                value="{{ $user->email }}"
-                                readonly disabled
-                                class="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
-                            {{-- Hidden input so the email still submits with the form --}}
-                            <input type="hidden" name="email" value="{{ $user->email }}">
-                            <p class="text-xs text-gray-400 mt-1">Username cannot be changed.</p>
-                        @endif
+                        <input type="text" value="{{ $user->email }}"
+                            readonly disabled
+                            class="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
+                        <input type="hidden" name="email" value="{{ $user->email }}">
+                        <p class="text-xs text-gray-400 mt-1">
+                            {{ $isGoogle ? 'Email cannot be changed.' : 'Username cannot be changed.' }}
+                        </p>
                     </div>
 
+                    {{-- Profile Photo: still editable --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo</label>
                         @if($user->profile_photo_path)
