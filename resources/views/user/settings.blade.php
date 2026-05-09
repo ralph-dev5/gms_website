@@ -38,16 +38,25 @@
                     </div>
 
                     <div>
-                        {{-- Google users: show "Email" label with email field
-                             Regular users: show "Username" label with username field --}}
                         <label class="block text-sm font-medium text-gray-700 mb-1">
                             {{ $isGoogle ? 'Email' : 'Username' }}
                         </label>
-                        <input
-                            type="{{ $isGoogle ? 'email' : 'text' }}"
-                            name="email"
-                            value="{{ old('email', $user->email) }}"
-                            class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+
+                        @if($isGoogle)
+                            {{-- Google users can edit their email --}}
+                            <input type="email" name="email"
+                                value="{{ old('email', $user->email) }}"
+                                class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        @else
+                            {{-- Regular users cannot edit their username --}}
+                            <input type="text"
+                                value="{{ $user->email }}"
+                                readonly disabled
+                                class="w-full border rounded-lg px-4 py-2 bg-gray-100 text-gray-500 cursor-not-allowed">
+                            {{-- Hidden input so the email still submits with the form --}}
+                            <input type="hidden" name="email" value="{{ $user->email }}">
+                            <p class="text-xs text-gray-400 mt-1">Username cannot be changed.</p>
+                        @endif
                     </div>
 
                     <div>
