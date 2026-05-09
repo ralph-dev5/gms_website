@@ -49,7 +49,7 @@ class AdminController extends Controller
         $totalUsers = User::count();
         $totalReports = Report::withTrashed()->count();
         $pendingReports = Report::withTrashed()->where('status', 'pending')->count();
-        $resolvedReports = Report::withTrashed()->where('status', 'resolved')->count();
+        $resolvedReports = Report::withTrashed()->where('status', 'completed')->count();
 
         $range = $request->get('range', 'month');
 

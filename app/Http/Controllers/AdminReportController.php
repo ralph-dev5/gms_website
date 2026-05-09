@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AdminReportController extends Controller
@@ -11,6 +12,7 @@ class AdminReportController extends Controller
     public function dashboard()
     {
         $reports = Report::with('user')->latest()->get();
+
         return view('admin.dashboard', compact('reports'));
     }
 
@@ -21,15 +23,16 @@ class AdminReportController extends Controller
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%");
         })->latest()->paginate(10);
+
         return view('admin.users', compact('users', 'search'));
     }
 
     public function analytics(Request $request)
     {
         $totalUsers = User::count();
-        $totalReports = Report::count();
-        $pendingReports = Report::where('status', 'pending')->count();
-        $resolvedReports = Report::where('status', 'resolved')->count();
+        $totalReports = Report::withTrashed()->count();
+        $pendingReports = Report::withTrashed()->where('status', 'pending')->count();
+        $resolvedReports = Report::withTrashed()->where('status', 'completed')->count();
 
         $range = $request->get('range', 'month');
 
@@ -38,13 +41,13 @@ class AdminReportController extends Controller
             'week' => now()->startOfWeek(),
             'month' => now()->startOfMonth(),
             'custom' => $request->custom_month
-            ? \Carbon\Carbon::parse($request->custom_month . '-01')->startOfMonth()
+            ? Carbon::parse($request->custom_month.'-01')->startOfMonth()
             : now()->startOfMonth(),
             default => now()->startOfMonth(),
         };
 
         $endDate = ($range === 'custom' && $request->custom_month)
-            ? \Carbon\Carbon::parse($request->custom_month . '-01')->endOfMonth()
+            ? Carbon::parse($request->custom_month.'-01')->endOfMonth()
             : now()->endOfDay();
 
         $streetRankings = Report::withTrashed()
@@ -70,6 +73,7 @@ class AdminReportController extends Controller
     public function deletedReports()
     {
         $reports = Report::onlyTrashed()->with('user')->latest()->get();
+
         return view('admin.deleted-reports', compact('reports'));
     }
 
@@ -82,6 +86,7 @@ class AdminReportController extends Controller
     {
         $user = User::findOrFail($id);
         $reports = Report::where('user_id', $id)->latest()->get();
+
         return view('admin.user-reports', compact('user', 'reports'));
     }
 
@@ -92,6 +97,7 @@ class AdminReportController extends Controller
             return back()->with('error', 'Admin users cannot be deleted.');
         }
         $user->delete();
+
         return back()->with('success', 'User deleted successfully.');
     }
 
@@ -100,6 +106,7 @@ class AdminReportController extends Controller
         $request->validate(['status' => ['required', 'in:pending,in_progress,completed']]);
         $report = Report::findOrFail($id);
         $report->update(['status' => $request->status]);
+
         return back()->with('success', 'Report status updated.');
     }
 
@@ -108,6 +115,7 @@ class AdminReportController extends Controller
     {
         $report = Report::where('id', $id)->where('status', 'completed')->firstOrFail();
         $report->delete();
+
         return back()->with('success', 'Report deleted.');
     }
 }
