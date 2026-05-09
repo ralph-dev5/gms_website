@@ -74,7 +74,8 @@ class AdminController extends Controller
                 break;
         }
 
-        $streetRankings = Report::selectRaw('title as street, COUNT(*) as total')
+        $streetRankings = Report::withTrashed()
+            ->selectRaw('title as street, COUNT(*) as total')
             ->whereNotNull('title')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('title')
