@@ -62,6 +62,7 @@ class ReportController extends Controller
 
     /**
      * Soft-delete the user's own report.
+     * Only allowed if the report status is 'completed'.
      * Deleted reports go to the user's deleted reports page only.
      * Admin dashboard is NOT affected.
      */
@@ -70,6 +71,10 @@ class ReportController extends Controller
         $report = Report::where('id', $id)
             ->where('user_id', auth()->id())
             ->firstOrFail();
+
+        if ($report->status !== 'completed') {
+            return back()->with('error', 'You can only delete completed reports.');
+        }
 
         $report->delete(); // soft delete — hidden from active list, visible in user's deleted reports
 
