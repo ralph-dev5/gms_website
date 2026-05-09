@@ -47,9 +47,9 @@ class AdminController extends Controller
     public function analytics(Request $request)
     {
         $totalUsers = User::count();
-        $totalReports = Report::count();
-        $pendingReports = Report::where('status', 'pending')->count();
-        $resolvedReports = Report::where('status', 'resolved')->count();
+        $totalReports = Report::withTrashed()->count();
+        $pendingReports = Report::withTrashed()->where('status', 'pending')->count();
+        $resolvedReports = Report::withTrashed()->where('status', 'resolved')->count();
 
         $range = $request->get('range', 'month');
 
