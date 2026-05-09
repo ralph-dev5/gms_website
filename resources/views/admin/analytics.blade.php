@@ -35,6 +35,12 @@
                     <p class="text-gray-500 text-sm mt-1">
                         {{ $startDate->format('M d, Y') }} — {{ $endDate->format('M d, Y') }}
                     </p>
+                    <p class="text-xs text-green-600 mt-1 flex items-center gap-1">
+                        <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        Rankings are permanently recorded and unaffected by deletions
+                    </p>
                 </div>
 
                 {{-- Range Filter Buttons --}}
@@ -70,14 +76,14 @@
         </div>
 
         {{-- Street Rankings Table --}}
-        @if($monthlyStreetReports->isEmpty())
+        @if($streetRankings->isEmpty())
             <div class="bg-white shadow rounded-lg p-6 text-center text-gray-500">
                 No street report data available for this period.
             </div>
         @else
             @php
-                $max = $monthlyStreetReports->max('total');
-                $min = $monthlyStreetReports->min('total');
+                $max = $streetRankings->max('total');
+                $min = $streetRankings->min('total');
                 $sectionLabel = match($range) {
                     'today'  => 'Today — ' . now()->format('M d, Y'),
                     'week'   => 'This Week (' . $startDate->format('M d') . ' – ' . $endDate->format('M d, Y') . ')',
@@ -100,20 +106,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($monthlyStreetReports as $i => $street)
+                            @foreach($streetRankings as $i => $row)
                             <tr class="border-b hover:bg-gray-50">
                                 <td class="px-6 py-3 text-gray-400 text-sm">{{ $i + 1 }}</td>
-                                <td class="px-6 py-3 font-medium text-gray-800">{{ $street->street }}</td>
+                                <td class="px-6 py-3 font-medium text-gray-800">{{ $row->street }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <span class="inline-block px-2 py-1 rounded text-sm font-bold
-                                        {{ $street->total >= $max ? 'bg-red-100 text-red-600' : ($street->total == $min ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
-                                        {{ $street->total }}
+                                        {{ $row->total >= $max ? 'bg-red-100 text-red-600' : ($row->total == $min ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
+                                        {{ $row->total }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-3 w-40">
                                     <div class="w-full bg-gray-100 rounded-full h-2">
-                                        <div class="h-2 rounded-full {{ $street->total >= $max ? 'bg-red-500' : 'bg-green-500' }}"
-                                            style="width: {{ $max > 0 ? ($street->total / $max) * 100 : 0 }}%">
+                                        <div class="h-2 rounded-full {{ $row->total >= $max ? 'bg-red-500' : 'bg-green-500' }}"
+                                            style="width: {{ $max > 0 ? ($row->total / $max) * 100 : 0 }}%">
                                         </div>
                                     </div>
                                 </td>
