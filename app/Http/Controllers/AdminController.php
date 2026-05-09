@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\User;
 use Carbon\Carbon;
+use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -31,9 +32,9 @@ class AdminController extends Controller
         $search = $request->search;
 
         $users = User::when($search, function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                      ->orWhere('email', 'like', "%{$search}%");
-            })
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+        })
             ->latest()
             ->paginate(10);
 
@@ -45,9 +46,9 @@ class AdminController extends Controller
      */
     public function analytics(Request $request)
     {
-        $totalUsers      = User::count();
-        $totalReports    = Report::count();
-        $pendingReports  = Report::where('status', 'pending')->count();
+        $totalUsers = User::count();
+        $totalReports = Report::count();
+        $pendingReports = Report::where('status', 'pending')->count();
         $resolvedReports = Report::where('status', 'resolved')->count();
 
         $range = $request->get('range', 'month');
@@ -55,25 +56,25 @@ class AdminController extends Controller
         switch ($range) {
             case 'today':
                 $startDate = now()->startOfDay();
-                $endDate   = now()->endOfDay();
+                $endDate = now()->endOfDay();
                 break;
             case 'week':
                 $startDate = now()->startOfWeek();
-                $endDate   = now()->endOfWeek();
+                $endDate = now()->endOfWeek();
                 break;
             case 'custom':
                 $customMonth = $request->custom_month ?? now()->format('Y-m');
-                $startDate   = Carbon::parse($customMonth . '-01')->startOfMonth();
-                $endDate     = Carbon::parse($customMonth . '-01')->endOfMonth();
+                $startDate = Carbon::parse($customMonth.'-01')->startOfMonth();
+                $endDate = Carbon::parse($customMonth.'-01')->endOfMonth();
                 break;
             case 'month':
             default:
                 $startDate = now()->startOfMonth();
-                $endDate   = now()->endOfMonth();
+                $endDate = now()->endOfMonth();
                 break;
         }
 
-        $monthlyStreetReports = Report::selectRaw('title as street, COUNT(*) as total')
+        $streetRankings = Report::selectRaw('title as street, COUNT(*) as total')
             ->whereNotNull('title')
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('title')
@@ -85,7 +86,7 @@ class AdminController extends Controller
             'totalReports',
             'pendingReports',
             'resolvedReports',
-            'monthlyStreetReports',
+            'streetRankings',
             'startDate',
             'endDate',
             'range'
@@ -121,19 +122,19 @@ class AdminController extends Controller
         $user = auth()->user();
 
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'email'         => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'profile_photo' => 'nullable|image|max:2048',
         ]);
 
-        $user->name  = $request->name;
+        $user->name = $request->name;
         $user->email = $request->email;
 
         if ($request->hasFile('profile_photo')) {
-            $cloudinary = new \Cloudinary\Cloudinary([
+            $cloudinary = new Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
             ]);
@@ -160,10 +161,10 @@ class AdminController extends Controller
 
         $request->validate([
             'current_password' => 'required',
-            'password'         => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.']);
         }
 
@@ -178,7 +179,7 @@ class AdminController extends Controller
      */
     public function userReports($id)
     {
-        $user    = User::findOrFail($id);
+        $user = User::findOrFail($id);
         $reports = Report::where('user_id', $id)->latest()->get();
 
         return view('admin.user-reports', compact('user', 'reports'));
