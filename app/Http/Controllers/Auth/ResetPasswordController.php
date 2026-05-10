@@ -25,6 +25,11 @@ class ResetPasswordController extends Controller
             return redirect()->route('login')->with('error', 'This password reset link has expired.');
         }
 
+        $user = User::where('email', $passwordReset->email)->first();
+        if ($user && ! empty($user->google_id)) {
+            return redirect()->route('login')->with('error', 'Password reset is not available for Google sign-in users.');
+        }
+
         return view('auth.reset-password', ['token' => $token, 'email' => $passwordReset->email]);
     }
 
@@ -50,10 +55,14 @@ class ResetPasswordController extends Controller
             return back()->with('error', 'This password reset link has expired or is invalid.');
         }
 
-        // Find user and update password
+        // Find user and ensure the account is not a Google-only login.
         $user = User::where('email', $request->email)->first();
         if (! $user) {
             return back()->with('error', 'User not found.');
+        }
+
+        if (! empty($user->google_id)) {
+            return back()->with('error', 'Password reset is not available for Google sign-in users.');
         }
 
         $user->update(['password' => Hash::make($request->password)]);

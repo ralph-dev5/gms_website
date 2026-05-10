@@ -34,6 +34,12 @@ class ForgotPasswordController extends Controller
             return back()->with('status', __('If an account with that email exists, we have sent a password reset link.'));
         }
 
+        if (! empty($user->google_id)) {
+            return back()->withErrors([
+                'email' => __('Password reset is only available for users who sign in with username and password.'),
+            ]);
+        }
+
         // Delete existing password reset tokens
         DB::table('password_resets')->where('email', $user->email)->delete();
 
