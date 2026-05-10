@@ -19,10 +19,11 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:users,name',
             'email' => 'required|string|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ], [
+            'name.unique' => 'An account with this name already exists.',
             'email.required' => 'The username field is required.',
             'email.unique' => 'That username has already been taken.',
             'email.max' => 'The username may not be greater than 255 characters.',
