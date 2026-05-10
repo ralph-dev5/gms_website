@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -30,7 +31,7 @@ class SocialiteController extends Controller
     /**
      * Redirect the user to the OAuth Provider.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function redirectToProvider(string $provider)
     {
@@ -46,7 +47,7 @@ class SocialiteController extends Controller
     /**
      * Obtain the user information from the OAuth Provider and handle login/creation.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function handleProviderCallback(string $provider)
     {

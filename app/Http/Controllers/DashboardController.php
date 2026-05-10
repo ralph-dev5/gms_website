@@ -8,7 +8,7 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user   = auth()->user();
+        $user = auth()->user();
         $userId = $user->id;
 
         // Counts only active (non-deleted) reports for the user

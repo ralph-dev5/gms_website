@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Report;
 use App\Http\Requests\StoreReportRequest;
+use App\Models\Report;
 use Cloudinary\Cloudinary;
 
 class ReportController extends Controller
@@ -33,16 +33,16 @@ class ReportController extends Controller
         $data = $request->validated();
 
         $data['user_id'] = auth()->id();
-        $data['status']  = 'pending';
-        $data['title']   = $data['street'];
-        $data['image']   = null;
+        $data['status'] = 'pending';
+        $data['title'] = $data['street'];
+        $data['image'] = null;
         unset($data['street']);
 
         if ($request->hasFile('image')) {
             $cloudinary = new Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
             ]);

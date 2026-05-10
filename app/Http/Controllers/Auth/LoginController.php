@@ -18,14 +18,14 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|string',  // plain string — no email format check
+            'email' => 'required|string',  // plain string — no email format check
             'password' => 'required|string',
         ]);
 
         // Auth::attempt maps 'email' key → the 'email' column in users table
         // which stores usernames in your setup
         $credentials = [
-            'email'    => $request->email,
+            'email' => $request->email,
             'password' => $request->password,
         ];
 

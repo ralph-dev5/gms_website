@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -25,8 +25,8 @@ class UserController extends Controller
      */
     public function updateProfile(Request $request)
     {
-        $user     = auth()->user();
-        $isGoogle = !empty($user->google_id);
+        $user = auth()->user();
+        $isGoogle = ! empty($user->google_id);
 
         $request->validate([
             'profile_photo' => 'nullable|image|max:2048',
@@ -34,10 +34,10 @@ class UserController extends Controller
 
         // Only upload profile photo — name and email are readonly for all users
         if ($request->hasFile('profile_photo')) {
-            $cloudinary = new \Cloudinary\Cloudinary([
+            $cloudinary = new Cloudinary([
                 'cloud' => [
                     'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_key' => env('CLOUDINARY_API_KEY'),
                     'api_secret' => env('CLOUDINARY_API_SECRET'),
                 ],
             ]);
@@ -64,10 +64,10 @@ class UserController extends Controller
 
         $request->validate([
             'current_password' => 'required',
-            'password'         => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return back()->withErrors(['current_password' => 'Current password is incorrect.']);
         }
 

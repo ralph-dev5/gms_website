@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class OtpController extends Controller
 {
@@ -27,7 +28,7 @@ class OtpController extends Controller
 
         $user = User::where('phone', $phone)->first();
 
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors(['phone' => 'No account found with this phone number.']);
         }
 
@@ -80,7 +81,7 @@ class OtpController extends Controller
 
         $user = User::where('phone', $sessionPhone)->first();
 
-        if (!$user) {
+        if (! $user) {
             return back()->withErrors(['otp' => 'User not found.']);
         }
 
@@ -156,7 +157,7 @@ class OtpController extends Controller
             'name' => session('register_name'),
             'phone' => session('register_phone'),
             'email' => null,
-            'password' => bcrypt(\Illuminate\Support\Str::random(24)),
+            'password' => bcrypt(Str::random(24)),
         ]);
 
         session()->forget(['register_otp', 'register_name', 'register_phone', 'register_otp_expires_at']);
