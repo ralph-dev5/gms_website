@@ -218,13 +218,11 @@ class AdminController extends Controller
     }
 
     /**
-     * Admin hard-deletes a completed report permanently.
+     * Admin hard-deletes a report permanently.
      */
     public function destroyReport($id)
     {
-        $report = Report::where('id', $id)
-            ->where('status', 'completed')
-            ->firstOrFail();
+        $report = Report::findOrFail($id);
 
         $report->delete();
 
