@@ -42,6 +42,7 @@
                     <x-text-input id="password" type="password" name="password" required
                         autocomplete="current-password"
                         placeholder="••••••••••"
+                        <button type="button" onclick="togglePassword('password_confirmation')"
                         class="mt-1 block w-full rounded-xl border-gray-200 bg-gray-100 focus:border-green-500 focus:ring-green-500 px-4 py-3" />
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-xs" />
                 </div>
