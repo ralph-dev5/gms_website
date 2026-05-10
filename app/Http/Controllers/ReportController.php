@@ -13,6 +13,11 @@ class ReportController extends Controller
      */
     public function create()
     {
+        if ($this->hasOpenReport()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'You can only file a new report after your previous one is completed.');
+        }
+
         return view('reports.create');
     }
 
@@ -24,12 +29,25 @@ class ReportController extends Controller
         return redirect()->route('dashboard');
     }
 
+    private function hasOpenReport(): bool
+    {
+        return Report::where('user_id', auth()->id())
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->exists();
+    }
+
     /**
      * Store a new report.
      * Uploads image to Cloudinary if provided.
      */
     public function store(StoreReportRequest $request)
     {
+        if ($this->hasOpenReport()) {
+            return back()
+                ->withInput()
+                ->with('error', 'You can only file a new report after your previous one is completed.');
+        }
+
         $data = $request->validated();
 
         $data['user_id'] = auth()->id();

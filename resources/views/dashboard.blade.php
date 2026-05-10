@@ -29,15 +29,33 @@
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mb-6 px-2">
-                <h2 class="font-bold text-gray-800 text-xl">My Reports</h2>
-                <a href="{{ route('reports.create') }}"
-                    class="bg-green-600 text-white px-5 py-2.5 rounded-xl hover:bg-green-700 transition-all font-bold text-sm shadow-lg shadow-green-100 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Add Report
-                </a>
+            <div class="flex flex-col gap-2 mb-6 px-2">
+                <div class="flex justify-between items-center">
+                    <h2 class="font-bold text-gray-800 text-xl">My Reports</h2>
+                    @if($hasOpenReport)
+                        <button type="button"
+                            class="bg-gray-300 text-gray-700 px-5 py-2.5 rounded-xl transition-all font-bold text-sm shadow-inner"
+                            disabled>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Report
+                        </button>
+                    @else
+                        <a href="{{ route('reports.create') }}"
+                            class="bg-green-600 text-white px-5 py-2.5 rounded-xl hover:bg-green-700 transition-all font-bold text-sm shadow-lg shadow-green-100 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Add Report
+                        </a>
+                    @endif
+                </div>
+                @if($hasOpenReport)
+                    <p class="text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3">
+                        You already have an active report. You may submit a new one once your current report is completed.
+                    </p>
+                @endif
             </div>
 
             <div class="bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200">

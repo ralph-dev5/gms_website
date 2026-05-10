@@ -24,6 +24,10 @@ class DashboardController extends Controller
             ->where('status', 'completed')
             ->count();
 
+        $hasOpenReport = Report::where('user_id', $userId)
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->exists();
+
         // Only show active (non-deleted) reports on user dashboard
         $reports = Report::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
@@ -34,7 +38,8 @@ class DashboardController extends Controller
             'pendingCount',
             'inProgressCount',
             'completedCount',
-            'reports'
+            'reports',
+            'hasOpenReport'
         ));
     }
 }
