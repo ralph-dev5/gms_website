@@ -1,15 +1,16 @@
-<aside id="user-sidebar"
-    class="relative fixed md:static z-40 inset-y-0 left-0 w-64 bg-white shadow-md flex flex-col shrink-0
-           transform -translate-x-full md:translate-x-0 transition-transform duration-200">
+<!-- Mobile toggle button -->
+<div class="md:hidden fixed top-4 left-4 z-50">
+    <button onclick="document.getElementById('user-sidebar').classList.toggle('-translate-x-full')"
+        class="bg-white shadow p-2 rounded-lg">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+    </button>
+</div>
 
-    <div class="absolute top-4 right-4 md:hidden">
-        <button onclick="document.getElementById('user-sidebar').classList.toggle('-translate-x-full')"
-            class="bg-white shadow p-2 rounded-lg">
-            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
-        </button>
-    </div>
+<aside id="user-sidebar"
+    class="fixed md:static z-40 inset-y-0 left-0 w-64 bg-white shadow-md flex flex-col shrink-0
+           transform -translate-x-full md:translate-x-0 transition-transform duration-200">
 
     <div class="p-6 pt-16 md:pt-6 border-b">
         <h2 class="text-2xl font-bold text-gray-800">Dashboard</h2>
