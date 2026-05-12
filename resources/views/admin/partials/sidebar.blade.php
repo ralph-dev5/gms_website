@@ -1,12 +1,12 @@
-<!-- Mobile toggle button -->
-<div class="md:hidden fixed top-4 left-4 z-50">
-    <button onclick="document.getElementById('admin-sidebar').classList.toggle('-translate-x-full')"
-        class="bg-white shadow p-2 rounded-lg">
-        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-    </button>
-</div>
+<!-- ADMIN SIDEBAR -->
+<!-- Mobile toggle button - moves with admin sidebar -->
+<button id="admin-toggle"
+    onclick="document.getElementById('admin-sidebar').classList.toggle('-translate-x-full'); this.classList.toggle('translate-x-64')"
+    class="md:hidden fixed top-4 left-4 z-50 bg-white shadow-lg p-2 rounded-lg transition-transform duration-200">
+    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+</button>
 
 <aside id="admin-sidebar"
     class="fixed md:static z-40 inset-y-0 left-0 w-64 bg-white shadow-lg flex flex-col shrink-0
