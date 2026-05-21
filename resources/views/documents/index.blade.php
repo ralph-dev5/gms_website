@@ -46,7 +46,15 @@
                             <td class="px-5 py-3 text-gray-500 text-sm">{{ $req->admin_note ?? '—' }}</td>
                             <td class="px-5 py-3">
                                 @if($req->file_path)
-                                    <a href="{{ $req->file_path }}" target="_blank"
+                                    @php
+                                        $fileUrl = $req->file_path;
+                                        $ext = strtolower(pathinfo(parse_url($fileUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+                                        $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                        if (!$isImage) {
+                                            $fileUrl = str_replace('/image/upload/', '/raw/upload/', $fileUrl);
+                                        }
+                                    @endphp
+                                    <a href="{{ $fileUrl }}" target="_blank"
                                        class="inline-flex items-center gap-1 text-sm text-green-600 hover:underline font-semibold">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

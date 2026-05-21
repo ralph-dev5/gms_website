@@ -81,7 +81,15 @@
                                 @else
                                     <p class="text-xs text-gray-400 italic mb-1">{{ $req->admin_note ?? 'No note' }}</p>
                                     @if($req->file_path)
-                                        <a href="{{ $req->file_path }}" target="_blank"
+                                        @php
+                                            $fileUrl = $req->file_path;
+                                            $ext = strtolower(pathinfo(parse_url($fileUrl, PHP_URL_PATH), PATHINFO_EXTENSION));
+                                            $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                                            if (!$isImage) {
+                                                $fileUrl = str_replace('/image/upload/', '/raw/upload/', $fileUrl);
+                                            }
+                                        @endphp
+                                        <a href="{{ $fileUrl }}" target="_blank"
                                            class="inline-flex items-center gap-1 text-xs text-green-600 hover:underline font-semibold">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

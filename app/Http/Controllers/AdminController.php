@@ -295,9 +295,13 @@ class AdminController extends Controller
                 ],
             ]);
 
+            $file = $request->file('document_file');
+            $isImage = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png']);
+            $resourceType = $isImage ? 'image' : 'raw';
+
             $result = $cloudinary->uploadApi()->upload(
-                $request->file('document_file')->getRealPath(),
-                ['folder' => 'documents', 'resource_type' => 'auto']
+                $file->getRealPath(),
+                ['folder' => 'documents', 'resource_type' => $resourceType]
             );
 
             $filePath = $result['secure_url'];
