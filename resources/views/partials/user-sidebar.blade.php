@@ -29,5 +29,9 @@
             class="block px-4 py-2 rounded-lg font-semibold {{ request()->routeIs('reports.deleted') ? 'bg-green-100 text-green-700' : 'text-gray-700 hover:bg-gray-200' }}">
             Deleted Reports
         </a>
+        <a href="{{ route('documents.index') }}"
+            class="block px-4 py-2 rounded-lg font-semibold {{ request()->routeIs('documents.*') ? 'bg-green-100 text-green-700' : 'text-gray-700 hover:bg-gray-200' }}">
+            Documents
+        </a>
     </nav>
 </aside>

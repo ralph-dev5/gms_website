@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentRequestController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
@@ -130,6 +131,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/deleted', [ReportController::class, 'deleted'])->name('reports.deleted');
     });
 
+    // Document Requests
+    Route::prefix('documents')->group(function () {
+        Route::get('/', [DocumentRequestController::class, 'index'])->name('documents.index');
+        Route::get('/create', [DocumentRequestController::class, 'create'])->name('documents.create');
+        Route::post('/', [DocumentRequestController::class, 'store'])->name('documents.store');
+    });
+
     // Settings
     Route::get('/settings', [UserController::class, 'settings'])->name('settings');
     Route::put('/settings/profile', [UserController::class, 'updateProfile'])->name('settings.updateProfile');
@@ -153,6 +161,9 @@ Route::middleware(['auth', 'admin'])
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
         Route::get('/users/{id}/reports', [AdminController::class, 'userReports'])->name('admin.users.reports');
         Route::get('/analytics/street', [AdminController::class, 'streetReports'])->name('admin.analytics.street');
+
+        Route::get('/document-requests', [AdminController::class, 'documentRequests'])->name('admin.documents.index');
+        Route::put('/document-requests/{id}', [AdminController::class, 'updateDocumentRequest'])->name('admin.documents.update');
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
         Route::put('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])->name('admin.reports.updateStatus');
         Route::delete('/reports/{id}', [AdminController::class, 'destroyReport'])->name('admin.reports.destroy');

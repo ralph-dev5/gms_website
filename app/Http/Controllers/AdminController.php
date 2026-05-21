@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DocumentRequest;
 use App\Models\Report;
 use App\Models\User;
 use Carbon\Carbon;
@@ -253,6 +254,40 @@ class AdminController extends Controller
         $report->update(['status' => $request->status]);
 
         return back()->with('success', 'Report status updated.');
+    }
+
+    /**
+     * Admin: list all document requests.
+     */
+    public function documentRequests(Request $request)
+    {
+        $status = $request->get('status', 'all');
+
+        $requests = DocumentRequest::with('user')
+            ->when($status !== 'all', fn ($q) => $q->where('status', $status))
+            ->latest()
+            ->get();
+
+        return view('admin.document-requests', compact('requests', 'status'));
+    }
+
+    /**
+     * Admin: approve or reject a document request.
+     */
+    public function updateDocumentRequest(Request $request, $id)
+    {
+        $request->validate([
+            'status' => ['required', 'in:approved,rejected'],
+            'admin_note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $docRequest = DocumentRequest::findOrFail($id);
+        $docRequest->update([
+            'status' => $request->status,
+            'admin_note' => $request->admin_note,
+        ]);
+
+        return back()->with('success', 'Document request updated.');
     }
 
     /**

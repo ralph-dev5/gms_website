@@ -33,6 +33,10 @@
            class="block px-4 py-2 rounded-lg font-semibold {{ request()->routeIs('deleted-reports') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-200 text-gray-700' }}">
             Deleted Reports
         </a>
+        <a href="{{ route('admin.documents.index') }}"
+           class="block px-4 py-2 rounded-lg font-semibold {{ request()->routeIs('admin.documents.*') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-200 text-gray-700' }}">
+            Document Requests
+        </a>
         <a href="{{ route('admin.settings') }}"
            class="block px-4 py-2 rounded-lg font-semibold {{ request()->routeIs('admin.settings') ? 'bg-green-100 text-green-700' : 'hover:bg-gray-200 text-gray-700' }}">
             Settings
