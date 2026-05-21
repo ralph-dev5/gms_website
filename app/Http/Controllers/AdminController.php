@@ -176,6 +176,44 @@ class AdminController extends Controller
     }
 
     /**
+     * View all reports for a specific street within a date range.
+     */
+    public function streetReports(Request $request)
+    {
+        $street = $request->get('street');
+        $range = $request->get('range', 'month');
+        $customMonth = $request->get('custom_month', now()->format('Y-m'));
+
+        switch ($range) {
+            case 'today':
+                $startDate = now()->startOfDay();
+                $endDate = now()->endOfDay();
+                break;
+            case 'week':
+                $startDate = now()->startOfWeek();
+                $endDate = now()->endOfWeek();
+                break;
+            case 'custom':
+                $startDate = Carbon::parse($customMonth.'-01')->startOfMonth();
+                $endDate = Carbon::parse($customMonth.'-01')->endOfMonth();
+                break;
+            default:
+                $startDate = now()->startOfMonth();
+                $endDate = now()->endOfMonth();
+                break;
+        }
+
+        $reports = Report::withTrashed()
+            ->with('user')
+            ->where('title', $street)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->latest()
+            ->get();
+
+        return view('admin.street-reports', compact('street', 'reports', 'range', 'startDate', 'endDate', 'customMonth'));
+    }
+
+    /**
      * View a specific user's report history.
      */
     public function userReports($id)

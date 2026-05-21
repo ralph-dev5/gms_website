@@ -152,6 +152,7 @@ Route::middleware(['auth', 'admin'])
         Route::put('/settings/password', [AdminController::class, 'updatePassword'])->name('admin.settings.updatePassword');
         Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
         Route::get('/users/{id}/reports', [AdminController::class, 'userReports'])->name('admin.users.reports');
+        Route::get('/analytics/street', [AdminController::class, 'streetReports'])->name('admin.analytics.street');
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
         Route::put('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])->name('admin.reports.updateStatus');
         Route::delete('/reports/{id}', [AdminController::class, 'destroyReport'])->name('admin.reports.destroy');

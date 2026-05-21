@@ -107,9 +107,10 @@
                         </thead>
                         <tbody>
                             @foreach($streetRankings as $i => $row)
-                            <tr class="border-b hover:bg-gray-50">
+                            <tr class="border-b hover:bg-gray-50 cursor-pointer"
+                                onclick="window.location='{{ route('admin.analytics.street', ['street' => $row->street, 'range' => $range, 'custom_month' => request('custom_month', now()->format('Y-m'))]) }}'">
                                 <td class="px-6 py-3 text-gray-400 text-sm">{{ $i + 1 }}</td>
-                                <td class="px-6 py-3 font-medium text-gray-800">{{ $row->street }}</td>
+                                <td class="px-6 py-3 font-medium text-green-700 hover:underline">{{ $row->street }}</td>
                                 <td class="px-6 py-3 text-right">
                                     <span class="inline-block px-2 py-1 rounded text-sm font-bold
                                         {{ $row->total >= $max ? 'bg-red-100 text-red-600' : ($row->total == $min ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') }}">
