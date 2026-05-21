@@ -34,7 +34,8 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">
                                 @if($report->image)
-                                    <img src="/storage/{{ $report->image }}" class="w-14 h-14 object-cover rounded">
+                                    <img src="{{ str_starts_with($report->image, 'http') ? $report->image : asset('storage/' . $report->image) }}"
+                                         class="w-14 h-14 object-cover rounded">
                                 @else
                                     <span class="text-gray-400 text-sm">No Image</span>
                                 @endif
