@@ -26,6 +26,7 @@
                             <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Purpose</th>
                             <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
                             <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Admin Note</th>
+                            <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">File</th>
                             <th class="px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Date</th>
                         </tr>
                     </thead>
@@ -43,11 +44,25 @@
                                 </span>
                             </td>
                             <td class="px-5 py-3 text-gray-500 text-sm">{{ $req->admin_note ?? '—' }}</td>
+                            <td class="px-5 py-3">
+                                @if($req->file_path)
+                                    <a href="{{ $req->file_path }}" target="_blank"
+                                       class="inline-flex items-center gap-1 text-sm text-green-600 hover:underline font-semibold">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                        </svg>
+                                        Download
+                                    </a>
+                                @else
+                                    <span class="text-gray-400 text-xs">—</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-3 text-gray-400 text-xs whitespace-nowrap">{{ $req->created_at->format('M d, Y') }}</td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="px-5 py-8 text-center text-gray-500">
+                            <td colspan="6" class="px-5 py-8 text-center text-gray-500">
                                 No document requests yet.
                                 <a href="{{ route('documents.create') }}" class="text-green-600 hover:underline ml-1">Request one now.</a>
                             </td>

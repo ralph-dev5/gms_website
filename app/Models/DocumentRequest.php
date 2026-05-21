@@ -13,6 +13,7 @@ class DocumentRequest extends Model
         'purpose',
         'status',
         'admin_note',
+        'file_path',
     ];
 
     public function user(): BelongsTo

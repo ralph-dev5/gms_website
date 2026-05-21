@@ -56,11 +56,17 @@
                             <td class="px-5 py-3 text-xs text-gray-400 whitespace-nowrap">{{ $req->created_at->format('M d, Y') }}</td>
                             <td class="px-5 py-3">
                                 @if($req->status === 'pending')
-                                <form method="POST" action="{{ route('admin.documents.update', $req->id) }}" class="space-y-2 min-w-[180px]">
+                                <form method="POST" action="{{ route('admin.documents.update', $req->id) }}"
+                                      enctype="multipart/form-data" class="space-y-2 min-w-[200px]">
                                     @csrf
                                     @method('PUT')
                                     <input type="text" name="admin_note" placeholder="Note (optional)"
                                         class="w-full border rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-green-500">
+                                    <div>
+                                        <label class="text-xs text-gray-500 font-medium">Attach file (optional)</label>
+                                        <input type="file" name="document_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                            class="w-full text-xs mt-1 border rounded px-2 py-1">
+                                    </div>
                                     <div class="flex gap-1">
                                         <button type="submit" name="status" value="approved"
                                             class="flex-1 bg-green-500 text-white px-2 py-1 rounded text-xs hover:bg-green-600 font-semibold">
@@ -73,7 +79,17 @@
                                     </div>
                                 </form>
                                 @else
-                                    <span class="text-xs text-gray-400 italic">{{ $req->admin_note ?? 'No note' }}</span>
+                                    <p class="text-xs text-gray-400 italic mb-1">{{ $req->admin_note ?? 'No note' }}</p>
+                                    @if($req->file_path)
+                                        <a href="{{ $req->file_path }}" target="_blank"
+                                           class="inline-flex items-center gap-1 text-xs text-green-600 hover:underline font-semibold">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                            </svg>
+                                            View File
+                                        </a>
+                                    @endif
                                 @endif
                             </td>
                         </tr>

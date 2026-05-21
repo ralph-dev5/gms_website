@@ -272,19 +272,41 @@ class AdminController extends Controller
     }
 
     /**
-     * Admin: approve or reject a document request.
+     * Admin: approve or reject a document request, optionally attaching a file.
      */
     public function updateDocumentRequest(Request $request, $id)
     {
         $request->validate([
             'status' => ['required', 'in:approved,rejected'],
             'admin_note' => ['nullable', 'string', 'max:500'],
+            'document_file' => ['nullable', 'file', 'max:10240', 'mimes:pdf,doc,docx,jpg,jpeg,png'],
         ]);
 
         $docRequest = DocumentRequest::findOrFail($id);
+
+        $filePath = $docRequest->file_path;
+
+        if ($request->hasFile('document_file')) {
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => config('services.cloudinary.cloud_name'),
+                    'api_key' => config('services.cloudinary.api_key'),
+                    'api_secret' => config('services.cloudinary.api_secret'),
+                ],
+            ]);
+
+            $result = $cloudinary->uploadApi()->upload(
+                $request->file('document_file')->getRealPath(),
+                ['folder' => 'documents', 'resource_type' => 'auto']
+            );
+
+            $filePath = $result['secure_url'];
+        }
+
         $docRequest->update([
             'status' => $request->status,
             'admin_note' => $request->admin_note,
+            'file_path' => $filePath,
         ]);
 
         return back()->with('success', 'Document request updated.');
