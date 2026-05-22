@@ -271,9 +271,22 @@ class AdminController extends Controller
     }
 
     /**
-     * Admin: proxy-download a document file through Laravel (bypasses Cloudinary auth).
+     * Admin: proxy-download a document file (force download).
      */
     public function downloadDocument($id): StreamedResponse
+    {
+        return $this->serveDocument($id, 'attachment');
+    }
+
+    /**
+     * Admin: view a document inline in the browser.
+     */
+    public function viewDocument($id): StreamedResponse
+    {
+        return $this->serveDocument($id, 'inline');
+    }
+
+    private function serveDocument(int|string $id, string $disposition): StreamedResponse
     {
         $docRequest = DocumentRequest::findOrFail($id);
 
@@ -281,7 +294,6 @@ class AdminController extends Controller
 
         $url = $docRequest->file_path;
 
-        // Use stored extension; fall back to parsing URL
         $ext = $docRequest->file_extension
             ? strtolower($docRequest->file_extension)
             : strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
@@ -305,9 +317,13 @@ class AdminController extends Controller
 
         $mime = $mimeMap[$ext] ?? 'application/octet-stream';
         $filename = Str::slug($docRequest->document_type).'.'.$ext;
+        $body = $response->body();
 
-        return response()->streamDownload(function () use ($response) {
-            echo $response->body();
-        }, $filename, ['Content-Type' => $mime]);
+        return response()->streamDownload(function () use ($body) {
+            echo $body;
+        }, $filename, [
+            'Content-Type' => $mime,
+            'Content-Disposition' => $disposition.'; filename="'.$filename.'"',
+        ]);
     }
 }

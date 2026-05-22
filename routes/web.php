@@ -166,6 +166,7 @@ Route::middleware(['auth', 'admin'])
         Route::get('/document-requests', [AdminController::class, 'documentRequests'])->name('admin.documents.index');
         Route::put('/document-requests/{id}', [AdminController::class, 'updateDocumentRequest'])->name('admin.documents.update');
         Route::get('/document-requests/{id}/download', [AdminController::class, 'downloadDocument'])->name('admin.documents.download');
+        Route::get('/document-requests/{id}/view', [AdminController::class, 'viewDocument'])->name('admin.documents.view');
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
         Route::put('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])->name('admin.reports.updateStatus');
         Route::delete('/reports/{id}', [AdminController::class, 'destroyReport'])->name('admin.reports.destroy');
