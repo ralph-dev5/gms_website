@@ -136,6 +136,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [DocumentRequestController::class, 'index'])->name('documents.index');
         Route::get('/create', [DocumentRequestController::class, 'create'])->name('documents.create');
         Route::post('/', [DocumentRequestController::class, 'store'])->name('documents.store');
+        Route::get('/{id}/download', [DocumentRequestController::class, 'download'])->name('documents.download');
     });
 
     // Settings
@@ -164,6 +165,7 @@ Route::middleware(['auth', 'admin'])
 
         Route::get('/document-requests', [AdminController::class, 'documentRequests'])->name('admin.documents.index');
         Route::put('/document-requests/{id}', [AdminController::class, 'updateDocumentRequest'])->name('admin.documents.update');
+        Route::get('/document-requests/{id}/download', [AdminController::class, 'downloadDocument'])->name('admin.documents.download');
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
         Route::put('/reports/{id}/status', [AdminController::class, 'updateReportStatus'])->name('admin.reports.updateStatus');
         Route::delete('/reports/{id}', [AdminController::class, 'destroyReport'])->name('admin.reports.destroy');
