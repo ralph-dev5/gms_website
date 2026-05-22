@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DocumentRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -60,20 +61,17 @@ class DocumentRequestController extends Controller
     {
         $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
 
-        // Fix old URLs that were stored as /image/upload/ for non-image files
+        // Fix old URLs stored as /image/upload/ for non-image files
         $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
         if (! $isImage) {
             $url = str_replace('/image/upload/', '/raw/upload/', $url);
         }
 
-        $context = stream_context_create([
-            'http' => ['timeout' => 30, 'header' => 'User-Agent: Laravel/GMS'],
-            'ssl' => ['verify_peer' => false],
-        ]);
+        $response = Http::timeout(30)->get($url);
 
-        $contents = @file_get_contents($url, false, $context);
+        abort_if(! $response->successful(), 404, 'File could not be retrieved from storage.');
 
-        abort_if($contents === false, 404, 'File could not be retrieved from storage.');
+        $contents = $response->body();
 
         $mimeMap = [
             'pdf' => 'application/pdf',

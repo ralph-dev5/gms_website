@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Cloudinary\Cloudinary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -288,13 +289,8 @@ class AdminController extends Controller
             $url = str_replace('/image/upload/', '/raw/upload/', $url);
         }
 
-        $context = stream_context_create([
-            'http' => ['timeout' => 30, 'header' => 'User-Agent: Laravel/GMS'],
-            'ssl' => ['verify_peer' => false],
-        ]);
-
-        $contents = @file_get_contents($url, false, $context);
-        abort_if($contents === false, 404, 'File could not be retrieved.');
+        $response = Http::timeout(30)->get($url);
+        abort_if(! $response->successful(), 404, 'File could not be retrieved.');
 
         $mimeMap = [
             'pdf' => 'application/pdf',
@@ -308,8 +304,8 @@ class AdminController extends Controller
         $mime = $mimeMap[$ext] ?? 'application/octet-stream';
         $filename = Str::slug($docRequest->document_type).'.'.$ext;
 
-        return response()->streamDownload(function () use ($contents) {
-            echo $contents;
+        return response()->streamDownload(function () use ($response) {
+            echo $response->body();
         }, $filename, ['Content-Type' => $mime]);
     }
 }
