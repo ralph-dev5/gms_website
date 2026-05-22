@@ -14,6 +14,7 @@ class DocumentRequest extends Model
         'status',
         'admin_note',
         'file_path',
+        'file_extension',
     ];
 
     public function user(): BelongsTo

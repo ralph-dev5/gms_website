@@ -54,12 +54,21 @@ class DocumentRequestController extends Controller
 
         abort_if(! $docRequest->file_path, 404, 'No file attached.');
 
-        return $this->streamFile($docRequest->file_path, $docRequest->document_type);
+        return $this->streamFile(
+            $docRequest->file_path,
+            $docRequest->document_type,
+            $docRequest->file_extension
+        );
     }
 
-    private function streamFile(string $url, string $name): StreamedResponse
+    private function streamFile(string $url, string $name, ?string $ext): StreamedResponse
     {
-        $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+        // Use stored extension; fall back to parsing URL
+        if (! $ext) {
+            $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+        }
+
+        $ext = strtolower($ext);
 
         // Fix old URLs stored as /image/upload/ for non-image files
         $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
@@ -70,8 +79,6 @@ class DocumentRequestController extends Controller
         $response = Http::timeout(30)->get($url);
 
         abort_if(! $response->successful(), 404, 'File could not be retrieved from storage.');
-
-        $contents = $response->body();
 
         $mimeMap = [
             'pdf' => 'application/pdf',
@@ -85,8 +92,8 @@ class DocumentRequestController extends Controller
         $mime = $mimeMap[$ext] ?? 'application/octet-stream';
         $filename = Str::slug($name).'.'.$ext;
 
-        return response()->streamDownload(function () use ($contents) {
-            echo $contents;
+        return response()->streamDownload(function () use ($response) {
+            echo $response->body();
         }, $filename, ['Content-Type' => $mime]);
     }
 }

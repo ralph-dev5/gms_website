@@ -228,6 +228,7 @@ class AdminController extends Controller
 
         $docRequest = DocumentRequest::findOrFail($id);
         $filePath = $docRequest->file_path;
+        $fileExtension = $docRequest->file_extension;
 
         if ($request->hasFile('document_file')) {
             $cloudinary = new Cloudinary([
@@ -239,7 +240,8 @@ class AdminController extends Controller
             ]);
 
             $file = $request->file('document_file');
-            $isImage = in_array(strtolower($file->getClientOriginalExtension()), ['jpg', 'jpeg', 'png']);
+            $fileExtension = strtolower($file->getClientOriginalExtension());
+            $isImage = in_array($fileExtension, ['jpg', 'jpeg', 'png']);
             $resourceType = $isImage ? 'image' : 'raw';
 
             $result = $cloudinary->uploadApi()->upload(
@@ -248,17 +250,13 @@ class AdminController extends Controller
             );
 
             $filePath = $result['secure_url'];
-
-            // Fix URL for non-image files (PDFs, docs)
-            if ($resourceType === 'raw') {
-                $filePath = str_replace('/image/upload/', '/raw/upload/', $filePath);
-            }
         }
 
         $docRequest->update([
             'status' => $request->status,
             'admin_note' => $request->admin_note,
             'file_path' => $filePath,
+            'file_extension' => $fileExtension,
         ]);
 
         return back()->with('success', 'Document request updated.');
@@ -282,7 +280,11 @@ class AdminController extends Controller
         abort_if(! $docRequest->file_path, 404, 'No file attached.');
 
         $url = $docRequest->file_path;
-        $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+
+        // Use stored extension; fall back to parsing URL
+        $ext = $docRequest->file_extension
+            ? strtolower($docRequest->file_extension)
+            : strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
 
         $isImage = in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp']);
         if (! $isImage) {
