@@ -14,12 +14,12 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::firstOrNew(['email' => 'admin@example.com']);
+        $admin = User::firstOrNew(['email' => config('app.admin.email')]);
 
         if (! $admin->exists) {
             $admin->forceFill([
                 'name' => 'Administrator',
-                'password' => 'password123',
+                'password' => config('app.admin.password'),
                 'email_verified_at' => now(),
             ]);
         }

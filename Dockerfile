@@ -58,11 +58,14 @@ ENV PORT=80
 
 EXPOSE 80
 
-# Bind Apache to Render's $PORT, cache config/routes/views with runtime env vars,
-# optionally run migrations (set RUN_MIGRATIONS=true), then start Apache.
+# Bind Apache to Render's $PORT, write the DB SSL CA from $DB_SSL_CA_PEM (if set),
+# cache config/routes/views with runtime env vars, optionally run migrations
+# (RUN_MIGRATIONS=true) and create the admin (ADMIN_EMAIL + ADMIN_PASSWORD), then start Apache.
 CMD ["sh", "-c", "sed -ri \"s/Listen [0-9]+/Listen ${PORT}/\" /etc/apache2/ports.conf \
     && sed -ri \"s/<VirtualHost \\*:[0-9]+>/<VirtualHost *:${PORT}>/\" /etc/apache2/sites-available/000-default.conf \
+    && if [ -n \"$DB_SSL_CA_PEM\" ]; then mkdir -p storage/certs && printf '%s\\n' \"$DB_SSL_CA_PEM\" > storage/certs/db-ca.pem && export MYSQL_ATTR_SSL_CA=/var/www/html/storage/certs/db-ca.pem; fi \
     && (php artisan storage:link --force || true) \
     && php artisan config:cache && php artisan route:cache && php artisan view:cache \
-    && if [ \"$RUN_MIGRATIONS\" = \"true\" ]; then php artisan migrate --force; fi \
+    && if [ \"$RUN_MIGRATIONS\" = \"true\" ]; then php artisan migrate --force \
+       && if [ -n \"$ADMIN_EMAIL\" ] && [ -n \"$ADMIN_PASSWORD\" ]; then php artisan db:seed --class=AdminUserSeeder --force; fi; fi \
     && exec apache2-foreground"]

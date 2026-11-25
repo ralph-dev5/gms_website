@@ -1,8 +1,10 @@
 <?php
 
 use App\Models\User;
+use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
@@ -27,6 +29,27 @@ test('seeded admin can log in and reach the admin dashboard', function () {
 
     $this->assertAuthenticated();
     $this->get(route('admin.dashboard'))->assertOk();
+});
+
+test('admin seeder uses the configured admin email and promotes an existing account', function () {
+    config(['app.admin.email' => 'owner@example.com', 'app.admin.password' => 'chosen-pass-1']);
+    $existing = User::factory()->create(['email' => 'owner@example.com', 'password' => 'original-pass']);
+
+    $this->seed(AdminUserSeeder::class);
+
+    $admin = $existing->fresh();
+    expect($admin->is_admin)->toBeTrue()
+        ->and(Hash::check('original-pass', $admin->password))->toBeTrue();
+});
+
+test('admin seeder creates the configured admin with the configured password', function () {
+    config(['app.admin.email' => 'owner@example.com', 'app.admin.password' => 'chosen-pass-1']);
+
+    $this->seed(AdminUserSeeder::class);
+
+    $admin = User::where('email', 'owner@example.com')->first();
+    expect($admin->is_admin)->toBeTrue()
+        ->and(Hash::check('chosen-pass-1', $admin->password))->toBeTrue();
 });
 
 test('is_admin cannot be mass assigned', function () {

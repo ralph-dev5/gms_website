@@ -123,4 +123,19 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Default Administrator
+    |--------------------------------------------------------------------------
+    |
+    | Used by AdminUserSeeder. In production set ADMIN_EMAIL and ADMIN_PASSWORD;
+    | an existing account with that email is promoted, not overwritten.
+    |
+    */
+
+    'admin' => [
+        'email' => env('ADMIN_EMAIL', 'admin@example.com'),
+        'password' => env('ADMIN_PASSWORD', 'password123'),
+    ],
+
 ];
