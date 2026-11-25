@@ -54,6 +54,15 @@ RUN composer dump-autoload --optimize --no-dev --no-interaction \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
+ENV PORT=80
+
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+# Bind Apache to Render's $PORT, cache config/routes/views with runtime env vars,
+# optionally run migrations (set RUN_MIGRATIONS=true), then start Apache.
+CMD ["sh", "-c", "sed -ri \"s/Listen [0-9]+/Listen ${PORT}/\" /etc/apache2/ports.conf \
+    && sed -ri \"s/<VirtualHost \\*:[0-9]+>/<VirtualHost *:${PORT}>/\" /etc/apache2/sites-available/000-default.conf \
+    && (php artisan storage:link --force || true) \
+    && php artisan config:cache && php artisan route:cache && php artisan view:cache \
+    && if [ \"$RUN_MIGRATIONS\" = \"true\" ]; then php artisan migrate --force; fi \
+    && exec apache2-foreground"]
