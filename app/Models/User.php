@@ -23,8 +23,18 @@ class User extends Authenticatable
         'email',
         'password',
         'profile_photo_path',
+        'email_verified_at',
         'google_id',
+        'facebook_id',
+        'github_id',
+        'gitlab_id',
+        'bitbucket_id',
+        'slack_id',
+        'twitch_id',
+        'twitter_openid_id',
+        'linkedin_openid_id',
         'phone',
+        'phone_verified_at',
     ];
 
     /**
@@ -46,7 +56,9 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 

@@ -4,20 +4,26 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder
 {
-    public function run()
+    /**
+     * Create (or promote) the default administrator account.
+     *
+     * is_admin is intentionally not mass-assignable, so it is set with forceFill.
+     */
+    public function run(): void
     {
-        // Check if admin already exists
-        if (! User::where('email', 'admin@example.com')->exists()) {
-            User::create([
+        $admin = User::firstOrNew(['email' => 'admin@example.com']);
+
+        if (! $admin->exists) {
+            $admin->forceFill([
                 'name' => 'Administrator',
-                'email' => 'admin@example.com',
-                'password' => Hash::make('password123'), // change to a strong password
-                'is_admin' => true, // optional: if you have an is_admin column
+                'password' => 'password123',
+                'email_verified_at' => now(),
             ]);
         }
+
+        $admin->forceFill(['is_admin' => true])->save();
     }
 }

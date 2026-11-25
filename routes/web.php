@@ -40,18 +40,6 @@ Route::get('/test', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Temp: Fix Admin Account
-|--------------------------------------------------------------------------
-*/
-Route::get('/create-admin', function () {
-    DB::table('users')->where('email', 'admin@example.com')->update(['is_admin' => 1]);
-    $user = DB::table('users')->where('email', 'admin@example.com')->first();
-
-    return 'is_admin = '.$user->is_admin;
-});
-
-/*
-|--------------------------------------------------------------------------
 | Home Page
 |--------------------------------------------------------------------------
 */
